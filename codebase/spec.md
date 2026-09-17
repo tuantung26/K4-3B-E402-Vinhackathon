@@ -87,3 +87,58 @@ Các nguyên tắc trên được kiểm tra bằng golden set và trong phiên 
 - Không xây toàn bộ nền tảng VLearn, chỉ 1 bài/1 dạng bài.
 - Không tự động chấm điểm chính thức (chỉ chấm đúng/sai phục vụ luồng gợi ý).
 - Không đưa dữ liệu cá nhân hoặc dữ liệu gốc khóa học vào repo công khai — `SessionLog` phải được ẩn danh hoá.
+
+## 9. Luồng hoạt động chi tiết
+
+```mermaid
+flowchart TD
+	A[Học viên bắt đầu bài tập] --> B[Học viên làm bài trước khi xem lý thuyết]
+	B --> C{Bài làm đúng?}
+	C -- Đúng --> D[Khen ngợi + mở lý thuyết đầy đủ]
+	D --> Z[Kết thúc / Log kết quả]
+
+	C -- Sai --> E{AI có đủ căn cứ để xác định lỗi?}
+	E -- Không đủ --> F[AI nói rõ chưa chắc chắn, yêu cầu học viên làm rõ]
+	F --> G[Học viên bổ sung thông tin / làm rõ]
+	G --> E
+
+	E -- Đủ căn cứ --> H[AI phân tích lỗi cụ thể]
+	H --> I[AI đưa gợi ý ngắn, không đưa đáp án]
+	I --> J[AI dẫn đoạn tài liệu liên quan]
+	J --> K[Học viên tự sửa bài]
+	K --> L{Bài sửa đúng?}
+
+	L -- Vẫn sai --> M{Đã hết số lần gợi ý cho phép?}
+	M -- Chưa hết --> H
+	M -- Hết lượt --> N[Mở lý thuyết + đáp án, ghi nhận chưa tự sửa được]
+	N --> Z
+
+	L -- Đúng --> O[AI hỏi học viên giải thích nguyên nhân sai ban đầu]
+	O --> P{Giải thích hợp lý?}
+	P -- Chưa rõ --> Q[AI hỏi lại / gợi ý thêm để làm rõ]
+	Q --> O
+	P -- Hợp lý --> R[Xác nhận hoàn thành, mở lý thuyết tóm tắt]
+	R --> Z
+```
+
+### Mô tả các bước
+
+| Bước | Vai trò | Input | Output |
+|---|---|---|---|
+| 1. Làm bài trước lý thuyết | Học viên | Đề bài | Bài làm |
+| 2. Chấm đúng/sai | Hệ thống | Bài làm, đáp án chuẩn | Đúng / Sai |
+| 3. Kiểm tra căn cứ | AI | Bài làm sai, dữ liệu liên quan | Đủ / Không đủ căn cứ |
+| 4. Phân tích lỗi | AI | Bài làm sai, đáp án, tài liệu | Loại lỗi cụ thể |
+| 5. Gợi ý ngắn | AI | Loại lỗi | Một gợi ý, không phải đáp án |
+| 6. Dẫn tài liệu | AI | Loại lỗi | Đoạn tài liệu có mã section |
+| 7. Tự sửa | Học viên | Gợi ý và tài liệu | Bài sửa |
+| 8. Kiểm tra bài sửa | Hệ thống/AI | Bài sửa | Đúng / Sai |
+| 9. Kiểm tra giải thích | AI | Câu giải thích của học viên | Hợp lý / Chưa hợp lý |
+| 10. Kết thúc | Hệ thống | Kết quả toàn bộ luồng | Log và lý thuyết phù hợp |
+
+### Điều kiện dừng
+
+- Tối đa 2 lượt gợi ý trước khi mở đáp án và lý thuyết tóm tắt.
+- Nếu thiếu căn cứ, AI nói rõ chưa chắc chắn và yêu cầu làm rõ.
+- Nếu học viên sửa đúng nhưng giải thích chưa hợp lý, AI hỏi lại trước khi kết thúc.
+- Log chỉ lưu trạng thái phiên, số lượt gợi ý và kết quả; không lưu dữ liệu cá nhân.
