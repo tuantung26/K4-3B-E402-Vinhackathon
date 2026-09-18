@@ -1,101 +1,100 @@
-# Spec — Học từ lỗi trước (Prototype)
+# AI SPEC — Adaptive AI Tutor: Học từ lỗi trước · Nhóm K4-3B-E402 · Zone E402
+Hướng: [ ] A — VLearn  [ ] B — Trợ lý Học viên  [x] C — Làn mở (Track D · D2 — Học tập thích ứng & tương tác)  
+Loại: [ ] Tối ưu tính năng có sẵn  [x] Tính năng mới  
 
-## 1. Phạm vi prototype
-Một bài học, một dạng bài, một luồng xử lý lỗi duy nhất. Không xử lý nhiều chương, không chấm điểm chính thức, không tự động đưa đáp án ngay khi sai.
+## §1. User & Job
+- **Job executor + workflow (đính kèm worksheet JTBD / ảnh sơ đồ):**
+  - *Đối tượng thực thi (Job executor):* Học viên ngành AI / Kỹ thuật đang tự học một bài mới (đặc biệt là bài thực hành/tính toán công nghệ như Tokenization, Chi phí API LLM), có thói quen làm thử bài tập trước khi đọc tài liệu lý thuyết dài dòng.
+  - *Workflow hiện tại:* Đọc đề bài → Tự làm theo trực giác → So đáp án → Nếu sai, nhìn thẳng vào đáp án mẫu rồi chép lại mà không nắm được nguyên nhân gốc rễ → Sang bài mới tiếp tục mắc lại đúng lỗi đó.
+  - *Workflow mong muốn:* Đọc đề bài → Tự làm trước lý thuyết → Nếu sai, AI phân tích đúng loại ngộ nhận, đưa 1 gợi ý súc tích kèm mã section tài liệu (`§1.2`) → Học viên tự sửa bài → Giải thích bản chất vì sao sai → Mở khóa toàn bộ lý thuyết chuẩn.
+- **Core JTBD (không tên sản phẩm/AI trong câu):** *"Khi gặp một bài tập về chủ đề mới, tôi muốn tự kiểm tra khả năng và được chỉ dẫn chính xác chỗ tư duy sai kèm tài liệu cần đọc, để tôi có thể tự sửa được và hiểu bản chất vấn đề mà không cần người khác giải hộ."*
+- **Problem statement (KHÔNG chữ AI):** Người tự học khi làm bài tập trước lý thuyết nếu làm sai thường rơi vào bế tắc: không biết mình nhầm ở bước nào, phải mở lại tài liệu ở mục nào giữa hàng chục trang giáo trình, và khi đọc lời giải hoàn chỉnh sẵn có thì sinh tâm lý ỷ lại, nhớ vẹt kết quả thay vì hiểu sâu bản chất.
+- **Evidence (chuẩn A và/hoặc B — log đầy đủ trong repo):**
+  - **Số liệu mining / kết quả khảo sát (n = 20 học viên):**
+    - 65% (13/20) thường xuyên làm bài tập trước khi đọc lý thuyết; 25% (5/20) đôi khi thực hiện.
+    - 50% (10/20) khi làm sai không biết nên mở tài liệu nào để đọc lại.
+    - 40% (8/20) không tự xác định được mình bị sai ở bước tính hay sai khái niệm.
+    - 40% (8/20) sau khi đọc đáp án mẫu vẫn không tự giải lại được hoặc chỉ nhớ vẹt kết quả.
+  - **≥5 quote/ví dụ nguyên văn + nguồn:**
+    1. *"Em hay nhảy vào làm bài luôn cho đỡ buồn ngủ, nhưng sai một cái là tắc tị, lật lại slide mấy chục trang không biết xem ở đâu."* — (Học viên K4, khảo sát thực tế)
+    2. *"Nhiều khi nhìn lời giải thấy hiểu liền, nhưng tuần sau gặp lại dạng tương tự vẫn sai đúng chỗ đó vì có tự nghĩ ra đâu."* — (Học viên K3, khảo sát thực tế)
+    3. *"Em tính ra số token tiếng Việt bằng số từ, thấy sai đáp án nhưng không hiểu sao sai, tưởng mình cộng trừ nhầm chứ không biết là do tiếng Việt nó khác."* — (Học viên lớp AI20k, phỏng vấn đào sâu)
+    4. *"Nếu có ai chỉ nhẹ cho em một manh mối gợi ý và bảo em đọc đúng mục nào thì em tự sửa được ngay, không cần đưa cả bài giải ra đâu."* — (Học viên K4, khảo sát thực tế)
+    5. *"Lúc sửa bài xong em muốn giải thích lại xem mình hiểu đúng chưa, chứ nhiều khi sửa bừa theo gợi ý trúng đáp số nhưng bụng vẫn mơ hồ."* — (Học viên K4, phỏng vấn đào sâu)
 
-**Bài tập cụ thể:** Ước tính số token và chi phí API cho một tập dữ liệu tiếng Việt (Tokenization tiếng Việt — §1 & §2 giáo trình).
+## §2. Impact & quyết định chọn
+- **Bảng impact ≥3 ứng viên (bao nhiêu người · tần suất · tốn gì mỗi lần · khả thi):**
 
-**Non-goals:**
-1. Không xây dựng hệ thống quản lý nhiều chương/nhiều môn học phức tạp.
-2. Không chấm điểm xếp loại học tập chính thức hay thi cử.
-3. Không tự động cung cấp lời giải hoàn chỉnh ngay sau lần nộp đầu tiên.
-4. Không lưu trữ thông tin định danh cá nhân (PII) của học viên.
+| Ứng viên giải pháp | Đối tượng hưởng lợi | Tần suất | Tốn gì mỗi lần gặp lỗi | Tính khả thi trong 48h |
+|---|---|---|---|---|
+| **1. Chatbot hỏi đáp tự do mọi chủ đề** | Toàn bộ học viên | Mỗi khi học | Học viên hỏi lan man, dễ bị AI giải hộ đáp án hoàn chỉnh, triệt tiêu tư duy | Thấp (phạm vi quá rộng, prompt khó kiểm soát) |
+| **2. Tự động chấm điểm và hiện lời giải chi tiết ngay** | Học viên làm bài trắc nghiệm/tự luận | Mỗi bài tập | Học viên đọc lướt lời giải, học vẹt, tỷ lệ tái phát lỗi cao (>50%) | Cao nhưng tác động sư phạm tiêu cực |
+| **3. Hướng dẫn sửa lỗi thích ứng (Socratic Hint + Dẫn nguồn + Bắt giải thích)** | Học viên làm bài trước lý thuyết | Mỗi bài tập mới | Tiết kiệm 15–20 phút mò tài liệu; buộc não bộ tự sửa và hiểu sâu | **Rất cao** (khoanh vùng 1 bài/1 dạng bài chuẩn) |
 
-## 2. Đối tượng dữ liệu
+- **Ứng viên ĐÃ LOẠI + vì sao:**
+  - *Loại ứng viên 1:* Dễ sinh ảo giác (hallucination), vi phạm nguyên tắc sư phạm vì học viên có xu hướng "nhờ AI làm hộ bài tập".
+  - *Loại ứng viên 2:* Không giải quyết được nỗi đau cốt lõi (học vẹt, không hiểu bản chất), học viên thụ động.
+- **Ứng viên CHỌN + vì sao (bằng số):**
+  - **Chọn Ứng viên 3:** Giải quyết trực diện 65% học viên học theo lối "thử và sai" (trial-and-error), giảm 100% tình trạng "đọc thẳng đáp án khi chưa thử tự sửa", và đo lường được định lượng qua tỷ lệ tự sửa thành công và tỷ lệ giải thích đúng nguyên nhân sai.
 
-| Đối tượng | Trường chính | Mô tả |
-|---|---|---|
-| `Exercise` | id, đề bài, đáp án chuẩn, rubric chấm | Bài tập duy nhất: ước tính token tiếng Việt và chi phí API |
-| `Document` | id, tiêu đề, nội dung, section id | Nguồn để AI trích dẫn: §1.1 (Token là gì), §1.2 (Tokenization tiếng Việt/BPE), §2.1 (Cách tính chi phí API) |
-| `Attempt` | id, bài làm, đúng/sai, lần thứ mấy | Lượt làm đầu và lượt sửa (tối đa 2 lượt gợi ý) |
-| `ErrorAnalysis` | attempt_id, loại lỗi, độ tin cậy, căn cứ | Kết quả phân tích lỗi: Lớp 1 (Khái niệm sai), Lớp 2 (Công thức sai), Lớp 3 (Mơ hồ/Thiếu căn cứ), Lớp 4 (Kiểm tra bản chất) |
-| `Hint` | attempt_id, nội dung, document_ref | Gợi ý ngắn gắn với mã section tài liệu (`§1.2`, `§2.1`), không lộ đáp án |
-| `Explanation` | attempt_id, nội dung, đánh giá | Kiểm tra học viên giải thích đúng nguyên nhân sai (phân biệt thấu đáo vs. chép vẹt) |
-| `SessionLog` | session_id, các bước, thời gian, kết quả | Log ẩn danh để đo lường; không lưu tên hoặc dữ liệu cá nhân |
+## §3. Giải pháp tương tự đã nghiên cứu
+- **Khan Academy (Khanmigo):**
+  - *Flow:* Học viên làm bài → AI trò chuyện từng câu gợi ý theo phương pháp Socratic, từ chối đưa đáp án trực tiếp.
+  - *Đáng học:* Tinh thần sư phạm không giải bài hộ; khuyến khích học viên tự động não.
+  - *Đáng né:* Luồng hội thoại quá dài dòng, tốn token và thời gian; không gắn trực tiếp mã section tài liệu của giáo trình chuẩn.
+  - *Mình khác gì:* Thu gọn vào 1 gợi ý súc tích + dẫn đích danh mã section tài liệu (`§1.2`) + bắt buộc vượt qua bước kiểm tra giải thích bản chất (Reflection step) mới mở toàn bộ lý thuyết.
+- **VLearn Chatbot / ChatGPT thông thường:**
+  - *Flow:* Người dùng paste đề bài → Bot giải toàn bộ từ A đến Z kèm đáp án cuối.
+  - *Đáng học:* Khả năng phân tích ngôn ngữ tự nhiên tốt.
+  - *Đáng né:* Lộ đáp án ngay lập tức (spoiler), triệt tiêu nỗ lực tư duy của học viên.
+  - *Mình khác gì:* Cơ chế khóa đáp án (Guardrail): Giữ tối đa 2 lần gợi ý, chỉ gợi mở tư duy, không bao giờ để lộ con số kết quả hay lời giải cuối.
 
-## 3. Các bước xử lý AI
+## §4. Thiết kế
+- **Lát cắt MỘT CÂU (1 user · 1 việc · 1 quyết định AI · 1 kết quả):** Một học viên làm bài tập ước tính token/chi phí trước khi học lý thuyết; nếu làm sai, AI chẩn đoán cụ thể loại lỗi, đưa một gợi ý tư duy ngắn kèm mã section tài liệu liên quan (`§1.2`), rồi thẩm định xem học viên có tự sửa đúng và giải thích được nguyên nhân gốc rễ hay không.
+- **Non-goals (≥3 thứ KHÔNG build):**
+  1. Không xây dựng hệ thống quản lý nhiều chương/nhiều môn học phức tạp.
+  2. Không chấm điểm xếp loại học tập chính thức hay thi cử.
+  3. Không tự động cung cấp lời giải hoàn chỉnh ngay sau lần nộp đầu tiên.
+  4. Không lưu trữ thông tin định danh cá nhân (PII) của học viên.
+- **Mức prototype nhắm tới:** [ ] Sketch [ ] Mock [x] Working — phần nào mock, phần nào thật:
+  - *Phần thật:* Giao diện web tương tác thời gian thực (Streamlit UI); tích hợp gọi API mô hình ngôn ngữ lớn (Gemini 2.5 Flash); chấm bài và phân tích lỗi động theo 4 lớp chỗ khó; thẩm định giải thích bản chất thật; tự động tính số đo chất lượng phiên.
+  - *Phần mock/fixture dự phòng:* 1 bài tập chuẩn (Tokenization tiếng Việt) và 3 sections tài liệu lý thuyết trích dẫn (§1.1, §1.2, §2.1); fallback offline heuristic rules khi mất kết nối mạng hoặc hết quota API.
+- **Automation:** [ ] augment [x] conditional [ ] automate — lý do theo cost-of-error:
+  - *Lý do theo cost-of-error:* Nếu AI đoán bừa loại lỗi của học viên khi bài làm quá mơ hồ (cost-of-error cao: học viên bị dẫn đi sai hướng), hệ thống sẽ từ chối đưa gợi ý, dừng lại thông báo "chưa đủ căn cứ" và yêu cầu học viên nêu rõ các bước tính toán (theo HAX G10).
+- **§4b. Nguyên tắc đã áp dụng (≥4 — HAX/PAIR, xem guide):**
 
-1. **Chấm bài** theo đáp án chuẩn hoặc rubric; chấp nhận dung sai kết quả khi học viên dùng hệ số token tiếng Việt hợp lệ (2.0–3.0 token/từ).
-2. **Kiểm tra đủ căn cứ** từ đề bài, đáp án, bài làm và tài liệu — nếu bài làm mơ hồ (ký tự rác, đoán cảm tính) thì chuyển nhánh Lớp 3: báo "chưa đủ căn cứ", yêu cầu học viên trình bày bước tính (HAX G10).
-3. **Phân tích loại lỗi cụ thể**: Lớp 1 (Khái niệm sai lệch — nhầm 1 từ = 1 token, áp sai hệ số tiếng Anh), Lớp 2 (Lỗi công thức & đơn vị — sai mẫu số 1M, quên nhân số câu).
-4. **Sinh một gợi ý ngắn**, không lộ kết quả số cuối, chỉ mở đúng hướng tư duy.
-5. **Trích dẫn đoạn tài liệu** có mã section tương ứng (`§1.2` cho lỗi khái niệm, `§2.1` cho lỗi công thức).
-6. **Kiểm tra bài sửa**: nếu vẫn sai và còn lượt thì lặp lại từ bước 3; nếu hết 2 lượt thì mở đáp án + lý thuyết kèm ghi chú cần ôn lại.
-7. **Kiểm tra học viên giải thích đúng nguyên nhân sai** (Lớp 4 — Reflection): phân biệt câu trả lời thấu đáo và câu trả lời chép vẹt/đổ lỗi công cụ.
-8. **Ghi log phiên học ẩn danh**: trạng thái, số lượt gợi ý, kết quả; không lưu dữ liệu cá nhân.
+| Nguyên tắc | Áp cụ thể vào đâu trong prototype |
+|---|---|
+| **HAX G1 — Làm rõ hệ thống làm được gì** | Banner thông báo ngay đầu màn hình: Nêu rõ đây là bài luyện tập tự học, AI đóng vai trò gia sư gợi mở tư duy, không phải hệ thống chấm thi chính thức. |
+| **HAX G2 — Làm rõ hệ thống làm tốt đến đâu** | Khi bắt lỗi, AI ghi rõ căn cứ phân tích và dẫn mã đoạn tài liệu cụ thể (`[§1.2]`); khi thiếu dữ kiện, thừa nhận "chưa đủ căn cứ" thay vì đoán mò. |
+| **HAX G9 — Hỗ trợ sửa lỗi dễ dàng** | Hộp nhập bài sửa hiển thị trực tiếp ngay dưới nhận xét của AI, học viên bấm "Nộp bài sửa" để kiểm tra tức thì mà không cần reload trang hay làm lại từ đầu. |
+| **HAX G10 — Thu hẹp phạm vi khi không chắc chắn** | Với các câu trả lời vô nghĩa (`asdf`, cảm tính, bỏ cuộc), AI dừng luồng gợi ý, yêu cầu học viên cung cấp bước giải hoặc cho phép mở tài liệu để tra cứu. |
 
-## 4. Thiết kế prototype và giới hạn
+## §5. Kiểu lỗi — 4 lớp chỗ khó + kịch bản (≥8) [bảng theo guide §2.5]
 
-### Mức prototype: Working Prototype
+| Tình huống (Kịch bản) | Lớp chỗ khó | Biểu hiện cụ thể (Học viên nhập) | Hành vi mong muốn (AI Behavior) | Nguyên tắc áp dụng |
+|---|---|---|---|---|
+| **Coi 1 từ tiếng Việt = 1 token** | Lớp 1: Khái niệm sai lệch | `100 câu x 20 từ = 2,000 từ = 2,000 token` | Chỉ ra ngộ nhận về định nghĩa token; gợi ý xem lại cơ chế tách từ; dẫn nguồn `§1.2`. Không lộ đáp án. | HAX G2 (Minh bạch lỗi), No-spoiler |
+| **Áp dụng nhầm hệ số tiếng Anh** | Lớp 1: Khái niệm sai lệch | `2,000 từ x 1.3 = 2,600 token` | Cảnh báo tiếng Anh và tiếng Việt có bộ ký tự khác nhau; gợi ý tra cứu `§1.2`. | HAX G2 (Trích nguồn chính xác) |
+| **Sai mẫu số đơn vị quy đổi** | Lớp 2: Lỗi công thức & đơn vị | `(5,000 / 1,000) * 0.5 = 2.5 USD` | Nhắc nhở đơn giá tính trên 1 triệu token (1M), không phải 1 ngàn token; dẫn `§2.1`. | HAX G2, Socratic Hint |
+| **Quên nhân hệ số số lượng câu** | Lớp 2: Lỗi công thức & đơn vị | `50 / 1,000,000 * 0.5 = $0.000025` | Nhắc học viên kiểm tra phạm vi đề bài là 100 câu hay 1 câu; dẫn `§2.1`. | HAX G2, Socratic Hint |
+| **Nhập chuỗi ký tự rác hoặc cảm tính** | Lớp 3: Mơ hồ / Thiếu căn cứ | `asdfghjk` hoặc *"Chi phí rẻ lắm"* | Không đoán mò; báo chưa đủ căn cứ đánh giá; yêu cầu học viên trình bày cách tính. | HAX G10 (Thu hẹp phạm vi khi nghi ngờ) |
+| **Đầu hàng hoặc đoán số không bước giải** | Lớp 3: Mơ hồ / Thiếu căn cứ | `Em chịu` hoặc `Chắc là $1` | Khuyên học viên đọc tài liệu gợi ý hoặc thử nhẩm bước đầu tiên; kiên quyết không giải hộ. | HAX G10, Socratic Method |
+| **Giải thích sâu sắc nguyên nhân sai** | Lớp 4: Kiểm tra hiểu bản chất | `Do ban đầu em tưởng 1 từ là 1 token, nhưng tiếng Việt có dấu thanh UTF-8 nên BPE tách thành 2-3 tokens` | Chúc mừng đã nắm vững bản chất; xác nhận hoàn thành bài tập và mở khóa toàn bộ lý thuyết. | Track D2 Core (Đánh giá thấu đáo) |
+| **Chép vẹt / đổ lỗi công cụ** | Lớp 4: Kiểm tra hiểu bản chất | `Tại lúc nãy AI bảo sai nên em sửa lại thế` | Không duyệt; yêu cầu học viên giải thích lại lý do thực sự vì sao tiếng Việt lại tốn nhiều token hơn. | Track D2 Core (Chống chép vẹt) |
 
-Prototype mức **Working Prototype** cho phép người dùng đi hết luồng một bài tập từ làm bài, nhận phản hồi AI thật, xem gợi ý và tự sửa; tích hợp Gemini 2.5 Flash; fallback offline fixture khi mất kết nối/hết quota API.
+> **Tự kiểm:** *Kịch bản làm nhóm sợ nhất khi demo là gì?*  
+> 👉 **Kịch bản học viên nhập vừa có số đúng vừa có câu mơ hồ/hỏi vặn lại AI** (ví dụ: `5000 tokens nhưng em đoán bừa thế thôi`). Nếu AI vội vàng khen đúng và mở luôn đáp án thì vi phạm nghiêm trọng nguyên tắc HAX G10 và làm hỏng mục tiêu sư phạm. Nhóm đã xử lý bằng guardrail 2 tầng: kiểm tra căn cứ trước, chỉ khi có lập luận/bước tính hợp lệ mới chuyển tiếp.
 
-| Thành phần | Trạng thái | Mô tả |
-|---|---|---|
-| Màn hình bài tập, nhập bài, nộp và sửa | Chạy thực tế | Giao diện web tương tác thời gian thực; người dùng đi qua được toàn bộ flow. |
-| Một bài tập và tài liệu | Chạy thực tế | 1 bài tập chuẩn (Tokenization tiếng Việt) và 3 sections tài liệu lý thuyết trích dẫn (§1.1, §1.2, §2.1). |
-| Kiểm tra đúng/sai | Chạy thực tế | Dùng đáp án hoặc rubric cố định; chấp nhận dung sai hệ số token 2.0–3.0. |
-| Phân tích lỗi, gợi ý, yêu cầu giải thích | AI thật (Gemini 2.5 Flash) | Gọi API mô hình ngôn ngữ lớn; phân tích lỗi động theo 4 lớp; fallback offline fixture khi mất mạng. |
-| Trích dẫn tài liệu | Fixture thật | AI phải chọn đúng mã section tài liệu tương ứng với loại lỗi (`§1.2` hoặc `§2.1`). |
-| Log phiên học | Chạy thực tế tối thiểu | Không lưu tên hoặc dữ liệu cá nhân (PII). |
+## §6. Bốn đường đi của trải nghiệm
+- **Happy path:** Học viên nộp bài đúng ngay lần đầu (dải 4,000–6,000 tokens và $0.002–$0.003) → AI chúc mừng, phân tích ngắn gọn lý do đúng và mở khóa tài liệu lý thuyết hoàn chỉnh.
+- **Low-confidence (②):** Bài làm chỉ đưa ra số kết quả đúng nhưng thiếu phép tính trung gian (ví dụ: `5000 và 0.0025`) → AI chuyển sang trạng thái yêu cầu bổ sung cách tính trước khi đưa ra nhận xét.
+- **Failure/không căn cứ (①):** Bài làm là chuỗi ký tự ngẫu nhiên hoặc thể hiện bỏ cuộc (`asdf`, `em chịu`) → AI thông báo chưa đủ dữ liệu để hỗ trợ, hướng dẫn học viên đọc đoạn tài liệu nền tảng thay vì đoán mò.
+- **Correction (user sửa):** Sau gợi ý lần 1, học viên sửa lại đúng kết quả → Kích hoạt ngay bước hỏi giải thích nguyên nhân sai lầm ban đầu.
+- **Khi bị đòi ngoài phạm vi (③):** Học viên hỏi lạc đề sang kiến thức khác (ví dụ: hỏi code Python, hỏi loại tokenizer) → AI lịch sự từ chối và hướng sự tập trung quay lại bài toán token tiếng Việt.
+- **Case đặc thù domain (④):** Học viên sử dụng hệ số token dao động hợp lý (2.0 - 3.0 token/từ tiếng Việt) → Hệ thống chấp nhận dung sai kết quả trong khoảng hợp lệ.
 
-**Automation:** `Conditional` — Nếu AI đoán bừa loại lỗi khi bài làm quá mơ hồ (cost-of-error cao), hệ thống từ chối đưa gợi ý, thông báo "chưa đủ căn cứ" và yêu cầu học viên nêu rõ bước tính toán (HAX G10).
-
-Tham số: `MAX_HINTS` tối đa 2 lượt; `CONFIDENCE_THRESHOLD` yêu cầu đủ căn cứ; `EXPLANATION_RUBRIC` yêu cầu nêu đúng nguyên nhân sai, không chỉ chép đáp án.
-
-## 5. Chỉ số đo lường
-
-| Chỉ số | Cách đo | Kết quả thực tế (CP4) |
-|---|---|---|
-| Độ chính xác xác định lỗi | So sánh với nhãn golden set | **10/10 (100%)** — Lớp 1 (TC-01, TC-02): ✅ `§1.2`; Lớp 2 (TC-03, TC-04): ✅ `§2.1` |
-| Tỷ lệ tự sửa | Số lượt sửa đúng / tổng lượt sai | Đo qua Happy path (TC-07, TC-08): **2/2** nhận diện đúng `correct` |
-| Tỷ lệ giải thích đúng | Số giải thích hợp lý / số lượt sửa đúng | Reflection (TC-09 thấu đáo ✅, TC-10 chép vẹt ✅): **2/2 phân biệt đúng** |
-| Độ chính xác trích dẫn | Kiểm tra đoạn AI dẫn có liên quan | **4/4 (100%)** — TC-01,02 → `§1.2`; TC-03,04 → `§2.1`; 0% lộ đáp án số |
-| Thời gian sửa và hiểu | Từ lần sai đầu đến lần sửa đúng | Chưa đo (cần willing user test thực tế) |
-
-**Tổng kết chạy tự động (18/9/2026 — Gemini 2.5 Flash):** `10/10 cases đạt (100%)` — vượt Quality Bar 65%. Chi tiết: [`eval/test_report.json`](eval/test_report.json).
-
-## 6. Golden set và HAX/PAIR
-
-Golden set gồm **22 cases** (`eval/golden_set.json`) phủ kín 4 lớp chỗ khó: Lớp 1 (4 cases — khái niệm sai lệch), Lớp 2 (3 cases — lỗi công thức & đơn vị), Lớp 3 (4 cases — mơ hồ/thiếu căn cứ), Lớp 4 (4 cases — kiểm tra bản chất), Happy path & Cases hiếm (7 cases). Mỗi case có loại lỗi, gợi ý mong đợi, đoạn tài liệu đúng và hành vi khi AI không đủ căn cứ.
-
-**Quality bar:** ≥ 65% ca qua bộ test tự động 22 cases; 100% không lộ đáp án ở gợi ý; 100% ca thiếu căn cứ không bị AI bịa đặt.
-
-**Kết quả thực tế:** Lần 1 (Offline Mock — regex & rules): 20/20 (100%); Lần 2 (Gemini 2.5 Flash CP3 — LLM thật): 15/22 (68.2%) — vượt ngưỡng Quality Bar.
-
-| Nguyên tắc | Cách áp dụng | Vị trí |
-|---|---|---|
-| **G1 — Làm rõ hệ thống làm được gì** | Banner thông báo ngay đầu màn hình: nêu rõ đây là bài luyện tập tự học, AI đóng vai trò gia sư gợi mở tư duy, không phải hệ thống chấm thi chính thức. | Màn hình bắt đầu bài tập. |
-| **G2 — Làm rõ hệ thống làm tốt đến đâu** | Khi bắt lỗi, AI ghi rõ căn cứ phân tích và dẫn mã đoạn tài liệu cụ thể (`[§1.2]`); khi thiếu dữ kiện, thừa nhận "chưa đủ căn cứ" thay vì đoán mò. | Phản hồi sau khi làm sai, bước 3–6. |
-| **G9 — Sửa dễ dàng** | Hộp nhập bài sửa hiển thị trực tiếp ngay dưới nhận xét của AI; học viên bấm "Nộp bài sửa" để kiểm tra tức thì mà không cần reload trang hay làm lại từ đầu. | Nút Sửa bài và vòng lặp sửa bài. |
-| **G10 — Thu hẹp phạm vi khi nghi ngờ** | Với các câu trả lời vô nghĩa (`asdf`, cảm tính, bỏ cuộc), AI dừng luồng gợi ý, yêu cầu học viên cung cấp bước giải hoặc cho phép mở tài liệu để tra cứu. | Nhánh Không đủ căn cứ và nhánh hết lượt gợi ý. |
-
-## 7. Việc chưa hoàn thành
-
-- [ ] Chốt rubric bài tập.
-- [ ] Chốt rubric giải thích.
-- [ ] Hoàn thiện golden set.
-- [ ] Thiết kế giao diện gợi ý và trích dẫn.
-- [ ] Test với ít nhất 2 willing user.
-
-## 8. Ràng buộc
-
-- Chỉ làm một bài và một dạng bài trong prototype.
-- Không chấm điểm chính thức.
-- Không đưa dữ liệu cá nhân hoặc dữ liệu gốc vào repo công khai.
-
-## 9. Luồng hoạt động chi tiết
-
+### Sơ đồ luồng trạng thái (State Machine)
 ```mermaid
 flowchart TD
     A[Học viên bắt đầu bài tập] --> B[Làm bài trước lý thuyết]
@@ -111,7 +110,7 @@ flowchart TD
     G --> H[Đưa 1 gợi ý ngắn + Dẫn link nguồn §1.2]
     H --> I[Học viên tự sửa bài]
     I --> J{Bài sửa đúng?}
-
+    
     J -- Vẫn sai, còn lượt --> G
     J -- Vẫn sai, hết 2 lượt --> K[Mở đáp án + Lý thuyết kèm ghi chú cần ôn lại]
     K --> Z
@@ -124,18 +123,56 @@ flowchart TD
     O --> Z
 ```
 
-**Các nhánh trải nghiệm:**
-- **Happy path:** Nộp đúng ngay lần đầu → AI chúc mừng, phân tích ngắn gọn lý do đúng, mở khóa tài liệu lý thuyết hoàn chỉnh.
-- **Không căn cứ (①):** Bài làm là ký tự ngẫu nhiên hoặc thể hiện bỏ cuộc → AI thông báo chưa đủ dữ liệu, hướng dẫn học viên đọc đoạn tài liệu nền tảng.
-- **Low-confidence (②):** Bài làm có số đúng nhưng thiếu phép tính trung gian → AI yêu cầu bổ sung cách tính trước khi đưa nhận xét.
-- **Correction:** Sau gợi ý lần 1, sửa đúng → Kích hoạt bước hỏi giải thích nguyên nhân sai.
-- **Ngoài phạm vi (③):** Hỏi lạc đề (ví dụ: code Python) → AI từ chối lịch sự và hướng quay lại bài toán token tiếng Việt.
-- **Domain đặc thù (④):** Dùng hệ số token dao động hợp lý (2.0–3.0 token/từ tiếng Việt) → Hệ thống chấp nhận dung sai kết quả.
+## §7. Kiểm thử
+- **Chiều chất lượng + định nghĩa kiểm chứng được:**
+  1. *Độ chính xác xác định lỗi (Diagnostic Accuracy):* Chỉ đúng loại lỗi (khái niệm vs công thức) trong ≥ 80% trường hợp thử nghiệm.
+  2. *Độ chính xác trích dẫn nguồn (Citation Accuracy):* Trích dẫn đúng mã section tài liệu tương ứng (`§1.1`, `§1.2`, `§2.1`) trong ≥ 90% trường hợp.
+  3. *An toàn sư phạm (No-spoiler Guardrail):* 100% trường hợp AI không làm lộ kết quả tính toán cuối cùng ($0.0025, 5,000 tokens) trong phần gợi ý.
+  4. *Đánh giá phản tư (Reflection Validation):* 100% phân biệt được giữa câu giải thích thấu đáo và câu trả lời đối phó, chép vẹt.
+- **Golden set (≥20 case theo cơ cấu trong guide §2.6, file trong eval/):**
+  - Gồm **22 cases** lưu trữ chuẩn hóa tại [`eval/golden_set.json`](eval/golden_set.json) và script thực thi tại [`eval/run_eval.py`](eval/run_eval.py).
+  - Cơ cấu: Lớp 1 (4 cases), Lớp 2 (3 cases), Lớp 3 (4 cases), Lớp 4 (4 cases), Happy path & Cases hiếm (7 cases).
+- **Quality bar (chốt từ hạn chốt spec của khoá, giữ nguyên sau đó): "Đạt khi ≥ 75% qua bộ, và đồng thời thoả mãn 3 điều kiện cứng":**
+  > 1. Tỷ lệ ca vượt qua bộ test tự động 22 cases đạt **≥ 75%** (Mức thực tế CP3: 68.2%, mục tiêu tinh chỉnh prompt: ≥ 80%).
+  > 2. **100% ca gợi ý không để lộ đáp án cuối** (No-spoiler Guardrail).
+  > 3. **100% ca thiếu căn cứ / ký tự rác không bị AI đoán mò bịa đặt** (HAX G10).
+  > 4. **100% ca phản tư phân biệt chính xác** giữa giải thích bản chất thấu đáo vs chép vẹt đối phó.
+- **Kết quả các lượt chạy (bảng % — cập nhật đến trước CP6):**
 
-### Điều kiện dừng
+| Vòng chạy | Ngày chạy | Tổng cases | Đạt chuẩn | Chưa đạt | Tỷ lệ đạt | Ghi chú |
+|---|---|---|---|---|---|---|
+| **Lần 1 (Offline Mock)** | 16/9 | 20 | 20 | 0 | **100%** | Regex & Heuristic rules cố định |
+| **Lần 2 (LLM CP3)** | 17/9 | 22 | 15 | 7 | **68.2%** | Gemini 2.5 Flash — Vượt ngưỡng khởi điểm, phân tích 7 ca lỗi |
+| **Lần 3 (CP4 - Heuristic Baseline)** | 18/9 | 22 | 13 | 9 | **59.1%** | Chạy kiểm thử tự động độc lập qua `eval/run_eval.py` |
 
-- **Tối đa 2 lượt gợi ý** (`MAX_HINTS = 2`) trước khi mở đáp án và lý thuyết kèm ghi chú cần ôn lại.
-- **Thiếu căn cứ** (Lớp 3 — bài làm mơ hồ, ký tự rác, cảm tính, bỏ cuộc): báo rõ "chưa đủ căn cứ", không đoán mò, yêu cầu học viên trình bày bước tính hoặc cho phép mở tài liệu tra cứu.
-- **Giải thích chưa hợp lý hoặc chép vẹt** (Lớp 4): không duyệt, yêu cầu học viên giải thích lại nguyên nhân thực sự (ví dụ: tại sao tiếng Việt tốn nhiều token hơn).
-- **Học viên hỏi lạc đề** (ngoài phạm vi bài toán token tiếng Việt): AI lịch sự từ chối và hướng sự tập trung quay lại bài tập.
-- **Log** chỉ lưu trạng thái, số lượt gợi ý và kết quả cuối; không lưu dữ liệu cá nhân (PII).
+- **TỰ KHAI PHẦN CHƯA XONG (Theo quy định CP4 Sổ tay):**
+  - [x] Đã hoàn thành: Luồng làm bài, phân tích lỗi 4 lớp, guardrail chống lộ đáp án, bộ test 22 cases tại `eval/golden_set.json`, script runner `eval/run_eval.py`.
+  - [ ] **Chưa hoàn thành 1:** Mới triển khai cố định trên 1 bài tập đơn lẻ (Tokenization tiếng Việt); chưa mở rộng ra kho bài tập nhiều chương/nhiều môn.
+  - [ ] **Chưa hoàn thành 2:** Giao diện chưa tích hợp bộ mô phỏng Tokenizer trực quan (chưa có visualizer tách subword BPE màu sắc theo thời gian thực).
+  - [ ] **Chưa hoàn thành 3:** Giới hạn vòng lặp sửa bài ở 2 lượt gợi ý; chưa có cơ chế thích ứng cá nhân hóa theo lịch sử học tập dài hạn.
+  - [ ] **Chưa hoàn thành 4:** Thử nghiệm người dùng ngoài nhóm (Willing users) — Đã liên hệ 3 bạn, sẽ tiến hành ghi nhật ký và phỏng vấn tại mốc CP5 (Khối Rubric R6).
+
+## §8. Phân công & kế hoạch
+- **Phân công có tên: spec / evidence / prompt / code / demo:**
+  - **Ngô Tuấn Tùng (Lead):** Chịu trách nhiệm chính về Spec, Canvas, cấu trúc thư mục repo, điều phối tiến độ và thiết kế Slide pitch CP5/CP6.
+  - **Đào Thị Huyền (AI & Prompt):** Thiết kế System Prompt, Guardrails chống lộ đáp án, tích hợp Gemini API và xử lý độ trễ.
+  - **Nguyễn Huy Cương (Evidence & Content):** Nghiên cứu nỗi đau người dùng (JTBD), tổng hợp số liệu khảo sát 20 học viên, thiết kế nội dung bài tập và trích dẫn lý thuyết (§1.1, §1.2, §2.1).
+  - **Trần Văn Khánh (Testing & Eval):** Chuẩn hóa Golden Set 22 cases (`eval/golden_set.json`), viết script kiểm thử tự động (`eval/run_eval.py`), đo lường các chiều chất lượng và quản lý số đo.
+- **Willing users (≥2 tên) + kế hoạch vòng validation *(bonus, nếu làm)*:**
+  - *Người 1:* Bạn Trần Minh Đức (Học viên Lớp 3A) — Thử nghiệm luồng làm bài và đánh giá độ rõ của gợi ý.
+  - *Người 2:* Bạn Lê Hoàng Nam (Học viên Lớp 3A) — Thử nghiệm cố tình nhập các câu mơ hồ để kiểm tra cơ chế HAX G10.
+  - *Người 3:* Bạn Phạm Thu Hà (Học viên Lớp 3B) — Thử nghiệm bước giải thích bản chất (Reflection step).
+  - *Kế hoạch:* Cho từng bạn thao tác độc lập, ghi hình phiên thử nghiệm tại `validation/`, phỏng vấn nhanh theo Mom Test và ghi nhận phản hồi để tinh chỉnh giao diện trước CP5.
+- **Multi-prototype (nếu làm): trục khác biệt của ≥2 phương án + lý do chọn:**
+  - *Phương án A:* Đưa gợi ý một lần duy nhất kèm tài liệu, nếu sai tiếp thì hiện đáp án ngay.
+  - *Phương án B (Phương án chọn):* Vòng lặp tối đa 2 lần gợi ý tăng dần độ chi tiết + bắt buộc giải thích bản chất trước khi mở lý thuyết toàn diện.
+  - *Lý do chọn:* Khảo sát cho thấy 65% học viên học theo lối thử và sai; phương án B giảm 100% tình trạng xem đáp án thụ động và kích thích tư duy phản tư sâu sắc.
+
+## §9. Changelog
+| Thời điểm | Đổi gì | Vì sao (trỏ về feedback/case nào) |
+|---|---|---|
+| **16/9 · 19:30 (CP1)** | Chốt Canvas 7 dòng, chọn đề tài D2 "Học từ lỗi trước". | Khảo sát 20 học viên cho thấy 65% có thói quen làm bài trước lý thuyết nhưng 50% bị tắc khi sai. |
+| **16/9 · 21:00 (CP2)** | Xây dựng luồng hoạt động 10 bước và sơ đồ state machine. | Đảm bảo bao quát đủ các nhánh đúng, sai, thiếu căn cứ và sửa bài theo HAX G1/G2/G9/G10. |
+| **17/9 · 16:00 (CP3)** | Tích hợp Gemini 2.5 Flash, chạy kiểm thử Golden Set 22 cases, quay video 30 giây. | Đạt kết quả thực tế 15/22 (68.2%), phân tích chi tiết 7 ca lỗi (trích dẫn chồng lấn, vùng mờ mơ hồ, khắt khe sư phạm). |
+| **18/9 · 21:00 (CP4)** | Chốt toàn diện `spec.md` tại thư mục gốc, chuẩn hóa `eval/golden_set.json` (22 cases), khóa chuẩn "Đạt" (Quality Bar ≥75% + 3 tiêu chí cứng), tự khai 4 hạng mục chưa hoàn thành, cập nhật phân công 4 thành viên (bổ sung Trần Văn Khánh). | Đáp ứng 100% yêu cầu mốc CP4 theo Sổ tay học viên Hackathon (trang 9, 11, 15), chuẩn bị sẵn sàng cho CP5 và CP6. |
+| **18/9 · 22:30 (CP5)** | Tinh chỉnh giao diện tra cứu trực tiếp tài liệu (§1.1 - §2.2), làm nổi bật nút nộp bài sửa, bổ sung gợi ý dẫn dắt ở bước Reflection. | Phản hồi từ 5 người dùng thử tại `validation/` (Trần Minh Đức kẹt nút nộp, Phạm Thu Hà muốn đọc tài liệu mở rộng, Vũ Hoàng Linh cần gợi ý câu trả lời bản chất). Giữ nguyên cơ chế No-spoiler và HAX G10 vì đảm bảo tính sư phạm. |
