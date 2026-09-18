@@ -10,7 +10,8 @@
 |---|---|---|---|
 | Ngô Tuấn Tùng | 2A202602826 |  |  |
 | Đào Thị Huyền | 2A202602670 |  |  |
-| Nguyễn Huy Cương |2A202602842 |  |  |
+| Nguyễn Huy Cương | 2A202602842 |  |  |
+| Trần Văn Khánh | 2A202602413 |  |  |
 
 > Nhóm copy nguyên file README này về repo của mình, rồi điền bảng trên. Cột **Phần việc đảm nhiệm** ghi càng cụ thể càng tốt.
 
