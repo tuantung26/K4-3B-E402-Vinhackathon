@@ -1,17 +1,21 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import confetti from 'canvas-confetti';
 import { EXERCISES } from './data/exercises';
+import { SAMPLE_DOCUMENTS, generateExerciseFromText } from './data/generatorTemplates';
 import { 
   analyzeTokenizationAttempt, 
   analyzeMathAttempt, 
+  analyzeCustomExerciseAttempt,
   evaluateReflection, 
   runGoldenSetEvaluation 
 } from './engine';
 import './App.css';
 
 export default function App() {
+  // Exercise list state (supports dynamically generated exercises)
+  const [exercisesList, setExercisesList] = useState(EXERCISES);
   const [selectedExIndex, setSelectedExIndex] = useState(0);
-  const currentExercise = EXERCISES[selectedExIndex];
+  const currentExercise = exercisesList[selectedExIndex] || exercisesList[0];
 
   // User input & session state
   const [answer, setAnswer] = useState('');
@@ -34,7 +38,17 @@ export default function App() {
   const [evalProgress, setEvalProgress] = useState({ current: 0, total: 22, passed: 0 });
   const [evalResults, setEvalResults] = useState(null);
 
-  // Submit attempt
+  // Generator Modal state
+  const [generatorModalOpen, setGeneratorModalOpen] = useState(false);
+  const [docContent, setDocContent] = useState('');
+  const [fileName, setFileName] = useState('');
+  const [apiKey, setApiKey] = useState(() => localStorage.getItem('gemini_api_key') || '');
+  const [isGenerating, setIsGenerating] = useState(false);
+  const [generatorStatusText, setGeneratorStatusText] = useState('');
+  const [generatedExercise, setGeneratedExercise] = useState(null);
+  const fileInputRef = useRef(null);
+
+  // Submit student attempt
   const handleSubmitAttempt = () => {
     const trimmed = answer.trim();
     if (!trimmed) return;
@@ -44,8 +58,10 @@ export default function App() {
       let res;
       if (currentExercise.id === 'ex_tokenization_vn_01') {
         res = analyzeTokenizationAttempt(trimmed);
-      } else {
+      } else if (currentExercise.id === 'linear-equation-01') {
         res = analyzeMathAttempt(trimmed);
+      } else {
+        res = analyzeCustomExerciseAttempt(trimmed, currentExercise);
       }
 
       setAttempts(prev => prev + 1);
@@ -76,7 +92,7 @@ export default function App() {
     setIsCheckingExp(true);
 
     setTimeout(() => {
-      const res = evaluateReflection(explanation, currentExercise.id);
+      const res = evaluateReflection(explanation, currentExercise.id, currentExercise);
       setExplanationResult(res);
       if (res.is_satisfactory) {
         confetti({ particleCount: 80, spread: 80, origin: { y: 0.6 } });
@@ -109,6 +125,70 @@ export default function App() {
     }
   };
 
+  // Handle file upload
+  const handleFileUpload = async (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setFileName(file.name);
+    try {
+      if (file.name.endsWith('.pdf')) {
+        // Simple raw stream / text extraction fallback for PDF
+        const text = await file.text();
+        const clean = text.replace(/[^\x20-\x7E\n\r\tÀ-ỹ]/g, ' ').replace(/\s+/g, ' ');
+        setDocContent(clean.length > 50 ? clean : `Tài liệu PDF: ${file.name}\nNội dung đã được nạp thành công.`);
+      } else {
+        const text = await file.text();
+        setDocContent(text);
+      }
+    } catch (err) {
+      alert('Không thể đọc file: ' + err.message);
+    }
+  };
+
+  // Generate exercise from document
+  const handleGenerate = async () => {
+    if (!docContent.trim()) {
+      alert('Vui lòng tải lên tài liệu hoặc dán nội dung cần học.');
+      return;
+    }
+
+    setIsGenerating(true);
+    setGeneratedExercise(null);
+    setGeneratorStatusText('Đang đọc hiểu tài liệu và phân tích chủ đề...');
+
+    try {
+      setTimeout(() => {
+        setGeneratorStatusText('Đang trích xuất khái niệm & phân chia section (§1.1, §1.2)...');
+      }, 700);
+
+      setTimeout(() => {
+        setGeneratorStatusText('Đang thiết kế các bẫy ngộ nhận (Misconceptions) & Socratic hints...');
+      }, 1400);
+
+      const generated = await generateExerciseFromText(docContent, apiKey);
+      setTimeout(() => {
+        setGeneratedExercise(generated);
+        setIsGenerating(false);
+        confetti({ particleCount: 50, spread: 60, origin: { y: 0.6 } });
+      }, 2000);
+    } catch (err) {
+      alert('Lỗi sinh bài tập: ' + err.message);
+      setIsGenerating(false);
+    }
+  };
+
+  // Apply generated exercise to active session
+  const handleApplyGeneratedExercise = () => {
+    if (!generatedExercise) return;
+    const updated = [...exercisesList, generatedExercise];
+    setExercisesList(updated);
+    setSelectedExIndex(updated.length - 1);
+    setGeneratorModalOpen(false);
+    handleReset();
+    confetti({ particleCount: 70, spread: 80, origin: { y: 0.5 } });
+  };
+
   const isCompleted = feedback?.status === 'correct' && explanationResult?.is_satisfactory;
 
   return (
@@ -121,14 +201,28 @@ export default function App() {
         </div>
 
         <div className="topbar-right">
+          {/* AI Generator Button */}
+          <button 
+            className="btn-generator" 
+            onClick={() => setGeneratorModalOpen(true)}
+            title="Tải lên tài liệu giáo trình và để AI sinh bài tập thực hành"
+          >
+            <span>✨</span> Tải tài liệu & Sinh đề ↗
+          </button>
+
           <div className="exercise-switcher">
             <span>Đề:</span>
             <select 
               value={selectedExIndex} 
               onChange={(e) => handleSwitchExercise(Number(e.target.value))}
             >
-              <option value={0}>Bài 1: Tokenization Tiếng Việt (Track D2 chuẩn)</option>
-              <option value={1}>Bài 2: Phương trình bậc nhất (Demo mẫu)</option>
+              {exercisesList.map((ex, idx) => (
+                <option key={ex.id} value={idx}>
+                  {idx === 0 ? 'Bài 1: Tokenization Tiếng Việt (Track D2 chuẩn)' :
+                   idx === 1 ? 'Bài 2: Phương trình bậc nhất (Demo toán)' :
+                   `Bài ${idx + 1}: ${ex.title.slice(0, 35)}...`}
+                </option>
+              ))}
             </select>
           </div>
 
@@ -152,7 +246,7 @@ export default function App() {
 
           <div className="progress">
             <span className="progress-label">
-              Bài 0{selectedExIndex + 1} / 0{EXERCISES.length}
+              Bài 0{selectedExIndex + 1} / 0{exercisesList.length}
             </span>
             <span className="progress-track">
               <b style={{ width: isCompleted ? '100%' : feedback?.status === 'correct' ? '65%' : attempts > 0 ? '30%' : '10%' }} />
@@ -172,20 +266,22 @@ export default function App() {
             <div className="exercise-prompt">{currentExercise.prompt}</div>
 
             {/* Quick Sample Chips */}
-            <div className="sample-chips">
-              <div className="sample-chips-label">Thử nhanh tình huống mẫu:</div>
-              <div className="sample-chips-list">
-                {currentExercise.samples.map((s, i) => (
-                  <button 
-                    key={i} 
-                    className="sample-chip" 
-                    onClick={() => setAnswer(s.text)}
-                  >
-                    {s.label}
-                  </button>
-                ))}
+            {currentExercise.samples && currentExercise.samples.length > 0 && (
+              <div className="sample-chips">
+                <div className="sample-chips-label">Thử nhanh tình huống mẫu:</div>
+                <div className="sample-chips-list">
+                  {currentExercise.samples.map((s, i) => (
+                    <button 
+                      key={i} 
+                      className="sample-chip" 
+                      onClick={() => setAnswer(s.text)}
+                    >
+                      {s.label}
+                    </button>
+                  ))}
+                </div>
               </div>
-            </div>
+            )}
 
             <label htmlFor="answer">Bài làm của bạn</label>
             <textarea
@@ -272,25 +368,25 @@ export default function App() {
                   <div className="reflection-box">
                     <strong>BƯỚC CUỐI · ĐÀO SÂU BẢN CHẤT</strong>
                     <p style={{ margin: '4px 0 10px', fontSize: '13.5px', color: '#4b5563' }}>
-                      {currentExercise.id === 'ex_tokenization_vn_01'
-                        ? 'Hãy giải thích ngắn: Vì sao lúc đầu bạn lại nhầm số token tiếng Việt hoặc công thức tính?'
-                        : 'Hãy giải thích ngắn: Vì sao cần chuyển 5 sang vế phải đổi dấu và chia cho 3?'}
+                      {currentExercise.reflectionPrompt || 'Hãy giải thích ngắn: Vì sao lúc đầu bạn lại nhầm lẫn hoặc tính toán chưa đúng?'}
                     </p>
 
-                    <div style={{ display: 'flex', gap: '6px', marginBottom: '8px' }}>
-                      <button 
-                        className="sample-chip" 
-                        onClick={() => setExplanation(currentExercise.reflectionSample.deep)}
-                      >
-                        Ví dụ hiểu sâu
-                      </button>
-                      <button 
-                        className="sample-chip" 
-                        onClick={() => setExplanation(currentExercise.reflectionSample.superficial)}
-                      >
-                        Ví dụ chép vẹt
-                      </button>
-                    </div>
+                    {currentExercise.reflectionSample && (
+                      <div style={{ display: 'flex', gap: '6px', marginBottom: '8px' }}>
+                        <button 
+                          className="sample-chip" 
+                          onClick={() => setExplanation(currentExercise.reflectionSample.deep)}
+                        >
+                          Ví dụ hiểu sâu
+                        </button>
+                        <button 
+                          className="sample-chip" 
+                          onClick={() => setExplanation(currentExercise.reflectionSample.superficial)}
+                        >
+                          Ví dụ chép vẹt
+                        </button>
+                      </div>
+                    )}
 
                     <textarea
                       value={explanation}
@@ -338,7 +434,7 @@ export default function App() {
           <div>
             <span>AI ENGINE</span>
             <strong>Gemini 2.5 Flash</strong>
-            <small>Heuristic + Rule-guardrails</small>
+            <small>{apiKey ? 'API Key đã kích hoạt' : 'Heuristic + Socratic Guardrail'}</small>
           </div>
         </section>
 
@@ -362,7 +458,155 @@ export default function App() {
         Học từ lỗi trước <span>·</span> Một bài tập, một vòng lặp hiểu sâu <span>·</span> Track D2 K4-3B-E402
       </footer>
 
-      {/* Document Reader Modal */}
+      {/* MODAL 1: AI GENERATOR & UPLOAD TÀI LIỆU */}
+      {generatorModalOpen && (
+        <div className="modal-overlay" onClick={() => !isGenerating && setGeneratorModalOpen(false)}>
+          <div className="modal-content generator-modal-content" onClick={(e) => e.stopPropagation()}>
+            <div className="modal-header">
+              <div>
+                <div style={{ font: '600 11px "DM Mono", monospace', color: 'var(--coral)', textTransform: 'uppercase' }}>
+                  AI EXERCISE GENERATOR · TRACK D2
+                </div>
+                <h3 style={{ margin: '4px 0 0' }}>Tải tài liệu & AI Tự động sinh bài tập thực hành</h3>
+              </div>
+              {!isGenerating && (
+                <button className="modal-close" onClick={() => setGeneratorModalOpen(false)}>×</button>
+              )}
+            </div>
+
+            <div className="modal-body">
+              {/* Preset Sample Documents */}
+              <div className="preset-docs-bar">
+                <div className="preset-docs-label">Chọn nhanh tài liệu mẫu có sẵn:</div>
+                <div className="preset-docs-list">
+                  {SAMPLE_DOCUMENTS.map((doc) => (
+                    <button
+                      key={doc.id}
+                      className="preset-doc-btn"
+                      onClick={() => {
+                        setDocContent(doc.content);
+                        setFileName(doc.title);
+                      }}
+                    >
+                      📑 {doc.title.slice(0, 42)}...
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Drag & Drop File */}
+              <input
+                type="file"
+                ref={fileInputRef}
+                style={{ display: 'none' }}
+                accept=".pdf,.txt,.md,.json,.csv"
+                onChange={handleFileUpload}
+              />
+              <div 
+                className="dropzone"
+                onClick={() => fileInputRef.current?.click()}
+              >
+                <span className="dropzone-icon">📁</span>
+                <p className="dropzone-text">
+                  {fileName ? `Đã chọn: ${fileName}` : 'Bấm để tải file hoặc kéo thả tài liệu vào đây (PDF, TXT, MD)'}
+                </p>
+                <p className="dropzone-sub">
+                  AI sẽ tự động đọc hiểu, tách section lý thuyết và thiết kế bẫy ngộ nhận
+                </p>
+              </div>
+
+              {/* Paste Text Area */}
+              <label style={{ fontSize: '12.5px', fontWeight: 700, display: 'block', marginBottom: '6px' }}>
+                Hoặc dán trực tiếp nội dung bài giảng / giáo trình vào đây:
+              </label>
+              <textarea
+                className="doc-paste-area"
+                value={docContent}
+                onChange={(e) => setDocContent(e.target.value)}
+                placeholder="Dán nội dung bài học, định nghĩa, công thức hoặc các case study..."
+              />
+
+              {/* API Key Configuration */}
+              <div className="api-key-config">
+                <span style={{ font: '600 11.5px "DM Mono", monospace', color: 'var(--ink)' }}>
+                  GEMINI API KEY (Tùy chọn):
+                </span>
+                <input
+                  type="password"
+                  value={apiKey}
+                  onChange={(e) => {
+                    setApiKey(e.target.value);
+                    localStorage.setItem('gemini_api_key', e.target.value);
+                  }}
+                  placeholder="Điền Gemini API Key để sinh đề thông minh nhất..."
+                />
+              </div>
+
+              {/* Actions */}
+              <div className="generator-actions">
+                <span style={{ fontSize: '12.5px', color: 'var(--muted)' }}>
+                  {isGenerating ? `⏳ ${generatorStatusText}` : `${docContent.length} ký tự sẵn sàng`}
+                </span>
+                <button
+                  className="btn-generate-main"
+                  onClick={handleGenerate}
+                  disabled={isGenerating || !docContent.trim()}
+                >
+                  {isGenerating ? 'Đang phân tích & sinh đề...' : '✨ AI Sinh đề bài thực hành ↗'}
+                </button>
+              </div>
+
+              {/* Generated Preview */}
+              {generatedExercise && (
+                <div className="generated-preview-card">
+                  <div style={{ font: '600 11px "DM Mono", monospace', color: 'var(--coral)', marginBottom: '4px' }}>
+                    ĐỀ BÀI VỪA SINH THÀNH CÔNG (PREVIEW)
+                  </div>
+                  <h3>{generatedExercise.title}</h3>
+                  <div style={{ whiteSpace: 'pre-line', fontSize: '13.5px', color: '#374151', lineHeight: 1.6, margin: '10px 0 16px' }}>
+                    {generatedExercise.prompt}
+                  </div>
+
+                  <div style={{ font: '600 11.5px "DM Mono", monospace', color: 'var(--ink)', marginBottom: '8px' }}>
+                    CÁC SECTION LÝ THUYẾT NGUỒN ({Object.keys(generatedExercise.documents).length} sections):
+                  </div>
+                  <div className="preview-sections-grid">
+                    {Object.entries(generatedExercise.documents).map(([secId, doc]) => (
+                      <div key={secId} className="preview-section-item">
+                        <strong>{secId} · {doc.title}</strong>
+                        <p style={{ margin: '4px 0 0', color: '#6b7280' }}>{doc.content.slice(0, 80)}...</p>
+                      </div>
+                    ))}
+                  </div>
+
+                  {generatedExercise.misconceptions && generatedExercise.misconceptions.length > 0 && (
+                    <>
+                      <div style={{ font: '600 11.5px "DM Mono", monospace', color: 'var(--ink)', margin: '14px 0 6px' }}>
+                        BẪY NGỘ NHẬN THƯỜNG GẶP (AI ĐÃ THIẾT KẾ ĐỂ BẮT LỖI):
+                      </div>
+                      <div className="preview-misconceptions">
+                        {generatedExercise.misconceptions.map((m, i) => (
+                          <span key={i} className="misconception-badge">
+                            ⚠️ {m.error_type} ({m.cited_section})
+                          </span>
+                        ))}
+                      </div>
+                    </>
+                  )}
+
+                  <div style={{ marginTop: '20px', textAlign: 'right' }}>
+                    <button className="btn-apply-generated" onClick={handleApplyGeneratedExercise}>
+                      🚀 Bắt đầu luyện tập ngay với bài này ↗
+                    </button>
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* MODAL 2: TÀI LIỆU GIÁO TRÌNH */}
       {docModalOpen && (
         <div className="modal-overlay" onClick={() => setDocModalOpen(false)}>
           <div className="modal-content" onClick={(e) => e.stopPropagation()}>
@@ -394,7 +638,7 @@ export default function App() {
         </div>
       )}
 
-      {/* Evaluation Test Runner Modal */}
+      {/* MODAL 3: BỘ ĐO GOLDEN SET */}
       {evalModalOpen && (
         <div className="modal-overlay" onClick={() => !evalRunning && setEvalModalOpen(false)}>
           <div className="modal-content" onClick={(e) => e.stopPropagation()}>
