@@ -147,8 +147,9 @@ export default function App() {
   };
 
   // Generate exercise from document
-  const handleGenerate = async () => {
-    if (!docContent.trim()) {
+  const handleGenerate = async (overrideContent = null) => {
+    const targetContent = (typeof overrideContent === 'string' ? overrideContent : docContent).trim();
+    if (!targetContent) {
       alert('Vui lòng tải lên tài liệu hoặc dán nội dung cần học.');
       return;
     }
@@ -163,10 +164,10 @@ export default function App() {
       }, 700);
 
       setTimeout(() => {
-        setGeneratorStatusText('Đang thiết kế các bẫy ngộ nhận (Misconceptions) & Socratic hints...');
+        setGeneratorStatusText('Đang thiết kế các bẫy ngộ nhận (Misconceptions) & Lời giải mẫu chuẩn...');
       }, 1400);
 
-      const generated = await generateExerciseFromText(docContent, apiKey);
+      const generated = await generateExerciseFromText(targetContent, apiKey);
       setTimeout(() => {
         setGeneratedExercise(generated);
         setIsGenerating(false);
@@ -176,6 +177,14 @@ export default function App() {
       alert('Lỗi sinh bài tập: ' + err.message);
       setIsGenerating(false);
     }
+  };
+
+  // Random exercise generator
+  const handleRandomGenerate = () => {
+    const randomDoc = SAMPLE_DOCUMENTS[Math.floor(Math.random() * SAMPLE_DOCUMENTS.length)];
+    setDocContent(randomDoc.content);
+    setFileName(randomDoc.title);
+    handleGenerate(randomDoc.content);
   };
 
   // Apply generated exercise to active session
@@ -505,7 +514,17 @@ export default function App() {
             <div className="modal-body">
               {/* Preset Sample Documents */}
               <div className="preset-docs-bar">
-                <div className="preset-docs-label">Chọn nhanh tài liệu mẫu có sẵn:</div>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
+                  <div className="preset-docs-label" style={{ margin: 0 }}>Chọn nhanh tài liệu mẫu có sẵn:</div>
+                  <button
+                    className="btn-random-generate"
+                    onClick={handleRandomGenerate}
+                    disabled={isGenerating}
+                    title="AI tự chọn ngẫu nhiên chủ đề và sinh đề + đáp án chuẩn tức thì"
+                  >
+                    🎲 Sinh đề ngẫu nhiên kèm đáp án chuẩn ↗
+                  </button>
+                </div>
                 <div className="preset-docs-list">
                   {SAMPLE_DOCUMENTS.map((doc) => (
                     <button

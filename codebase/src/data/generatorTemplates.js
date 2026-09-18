@@ -25,13 +25,35 @@ Trong cơ chế Scaled Dot-Product Attention, ma trận biểu diễn chuỗi Q 
 
 ## §2. Bộ nhớ KV-Cache trong giai đoạn Suy luận (Inference Decoding)
 Khi sinh văn bản tự hồi quy (Autoregressive Generation), mô hình phải tính từng token một. Để không phải tính toán lại Key và Value của các token trước đó, hệ thống lưu toàn bộ Key và Value vào bộ nhớ GPU gọi là KV-Cache. Kích thước KV-Cache tỷ lệ thuận với: 2 × (Số layer) × (Số Attention Heads) × (Hidden Dimension) × (Context Length) × (Bytes per parameter). Nhiều kỹ sư tính toán nhầm rằng chi phí bộ nhớ chỉ phụ thuộc vào số lượng tham số của mô hình (Weights), mà bỏ quên KV-Cache vốn có thể chiếm đến 60-80% VRAM GPU khi chạy đa người dùng (High Concurrency).`
+  },
+  {
+    id: 'lru-cache',
+    title: 'Hệ thống Caching: Chiến lược Loại trừ LRU và Dung lượng Bộ nhớ',
+    content: `# Kiến trúc Caching & Thuật toán Least Recently Used (LRU)
+
+## §1. Nguyên lý Hoạt động của LRU Cache
+LRU (Least Recently Used) tổ chức dữ liệu theo thứ tự truy cập gần nhất, thường kết hợp Hash Map (để tìm kiếm O(1)) và Doubly Linked List (để dịch chuyển node O(1)). Khi cache đầy dung lượng (Capacity) và có một phần tử mới được ghi vào, hệ thống phải loại bỏ (evict) phần tử ít được sử dụng nhất ở đuôi danh sách.
+
+## §2. Tính toán Tỷ lệ Trúng Cache (Cache Hit Rate) & Giảm tải Database
+Giả sử hệ thống xử lý 10,000 requests/phút. Nếu Cache Hit Rate đạt 80%, chỉ có 20% requests (2,000 requests) phải đọc trực tiếp từ Database. Nhiều kỹ sư tính toán sai khi tăng dung lượng cache lên gấp đôi nhưng không phân tích phân phối truy cập (định luật Pareto 80/20), dẫn đến việc tốn chi phí RAM đắt đỏ mà Hit Rate chỉ tăng thêm 1-2%.`
+  },
+  {
+    id: 'db-indexing',
+    title: 'Cơ sở dữ liệu: So sánh B-Tree Index Scan và Full Table Scan',
+    content: `# Tối ưu hóa Truy vấn Cơ sở Dữ liệu với Chỉ mục B-Tree
+
+## §1. Cấu trúc B-Tree Index và Chi phí Tìm kiếm O(log N)
+Khi tạo Index trên một cột, hệ thống xây dựng cây cân bằng B-Tree. Khi thực hiện truy vấn lọc chính xác WHERE id = 500,000 trên bảng 1 triệu dòng, B-Tree chỉ cần đọc khoảng log(N) trang đĩa (thường từ 3 đến 4 I/O operations). Ngược lại, nếu không có Index, hệ thống phải thực hiện Full Table Scan quét toàn bộ 1 triệu bản ghi từ ổ đĩa.
+
+## §2. Điểm hòa vốn (Tipping Point) và Chi phí Ghi (Write Penalty)
+Index không phải lúc nào cũng tốt: mỗi lệnh INSERT hoặc UPDATE đều phải cập nhật lại B-Tree, làm chậm thao tác ghi. Ngoài ra, nếu câu truy vấn lấy ra hơn 20-30% số dòng của bảng (Selectivity thấp), Database Optimizer sẽ quyết định bỏ qua Index và chạy Table Scan vì chi phí Random I/O của Index lúc này còn tốn kém hơn Sequential I/O.`
   }
 ];
 
 export async function generateExerciseFromText(rawText, customApiKey = null) {
   const text = rawText.trim();
-  if (text.length < 50) {
-    throw new Error('Tài liệu quá ngắn. Vui lòng cung cấp ít nhất 50 ký tự nội dung học tập.');
+  if (text.length < 10) {
+    throw new Error('Nội dung quá ngắn. Vui lòng cung cấp ít nhất 10 ký tự chủ đề hoặc tài liệu.');
   }
 
   // 1. Nếu có API key, gọi Gemini 2.5 Flash
@@ -158,6 +180,8 @@ function generateOfflineExercise(text) {
   // Phát hiện chủ đề từ khóa
   const isRAG = text.toLowerCase().includes('rag') || text.toLowerCase().includes('chunk');
   const isAttention = text.toLowerCase().includes('attention') || text.toLowerCase().includes('transformer');
+  const isCache = text.toLowerCase().includes('cache') || text.toLowerCase().includes('lru');
+  const isDatabase = text.toLowerCase().includes('index') || text.toLowerCase().includes('b-tree') || text.toLowerCase().includes('database') || text.toLowerCase().includes('sql');
 
   let prompt = '';
   let misconceptions = [];
@@ -216,6 +240,53 @@ Nếu bạn tăng độ dài văn bản đầu vào lên gấp 3 lần thành **
     ];
     standardKeywords = ['9 lần', '9x', 'bậc hai', 'o(n^2)', 'n^2'];
     reflectionKeywords = ['bậc hai', 'n²', 'n^2', 'q x k', 'ma trận n x n', 'quadratic'];
+  } else if (isCache) {
+    prompt = `**Đề bài thực hành LRU Caching & Capacity (Làm trước khi xem lý thuyết):**
+Một API xử lý **10,000 requests/phút**. Ban đầu không có Cache, toàn bộ 10,000 requests đều đập vào Database.
+Kỹ sư triển khai LRU Cache và đo được **Cache Hit Rate đạt 80%**.
+
+👉 **Yêu cầu:**
+1. Số lượng requests phải đọc trực tiếp từ Database mỗi phút giảm xuống còn bao nhiêu?
+2. Nếu tăng gấp đôi dung lượng Cache (RAM) thì tỷ lệ Hit Rate có chắc chắn tăng gấp đôi lên 160% không? Vì sao?
+*(Ghi rõ các bước tính toán và nhận định của bạn)*`;
+
+    misconceptions = [
+      {
+        keyword: '8000',
+        error_type: 'Nhầm lẫn giữa số request trúng cache và số request chạm database',
+        hint: 'Gợi ý: Hit Rate 80% nghĩa là 80% đã được phục vụ từ cache. Vậy số còn lại phải vào database là (100% - 80%)?',
+        cited_section: '§1.2'
+      },
+      {
+        keyword: '160%',
+        error_type: 'Ngộ nhận Hit Rate tỷ lệ thuận tuyến tính vô hạn',
+        hint: 'Gợi ý: Tỷ lệ phần trăm hit rate không thể vượt quá 100%, và theo quy luật Pareto chỉ một phần nhỏ dữ liệu được truy cập thường xuyên.',
+        cited_section: '§1.2'
+      }
+    ];
+    standardKeywords = ['2,000', '2000', '20%', 'không', 'pareto'];
+    reflectionKeywords = ['hit rate', 'miss rate', 'pareto', 'bão hòa', 'dung lượng'];
+  } else if (isDatabase) {
+    prompt = `**Đề bài thực hành Tối ưu Truy vấn SQL & B-Tree Index (Làm trước khi xem lý thuyết):**
+Bảng \`users\` có **1,000,000 dòng**. Ta cần chạy truy vấn:
+\`SELECT * FROM users WHERE status = 'active';\`
+Biết rằng 90% số dòng trong bảng đều có \`status = 'active'\`. Cột \`status\` đã được tạo B-Tree Index.
+
+👉 **Yêu cầu:**
+1. Database Query Optimizer sẽ chọn dùng B-Tree Index Scan hay Full Table Scan?
+2. Hãy giải thích ngắn lý do về mặt chi phí I/O (Random I/O vs Sequential I/O).
+*(Ghi rõ lập luận của bạn trước khi đối chiếu)*`;
+
+    misconceptions = [
+      {
+        keyword: 'index scan',
+        error_type: 'Ngộ nhận có Index thì luôn luôn được dùng',
+        hint: 'Gợi ý: Hãy chú ý rằng 90% bảng đều thỏa mãn điều kiện. Nếu dùng Index, ta phải nhảy con trỏ ngẫu nhiên (Random I/O) bao nhiêu lần so với đọc tuần tự một mạch (Sequential I/O)?',
+        cited_section: '§1.2'
+      }
+    ];
+    standardKeywords = ['table scan', 'full table scan', 'quét toàn bộ', 'sequential', 'tuần tự', 'random i/o'];
+    reflectionKeywords = ['selectivity', 'tipping point', 'sequential', 'random i/o', 'ngẫu nhiên'];
   } else {
     prompt = `**Đề bài áp dụng thực hành (Làm trước khi xem lý thuyết):**
 Dựa trên tài liệu bạn vừa cung cấp về "${title}":
@@ -240,6 +311,10 @@ Dựa trên tài liệu bạn vừa cung cấp về "${title}":
     ? '1. Bước trượt stride = 500 - 100 = 400 tokens.\nSố chunk thực tế = ceil((5000 - 500) / 400) + 1 = 12 hoặc 13 chunks (tùy xử lý biên).\n2. Tổng số tokens embedding lưu trữ tăng thêm 20-25% do 100 tokens gối đầu ở mỗi phân đoạn.'
     : isAttention
     ? '1. Chi phí FLOPs tăng theo hàm bậc hai O(N^2). Khi N tăng gấp 3 lần thì ma trận Attention Q x K^T tăng 3^2 = 9 lần.\n2. Bộ nhớ VRAM lưu trữ ma trận điểm N x N cũng tăng gấp 9 lần.'
+    : isCache
+    ? '1. Số request phải đọc từ Database = 10,000 × (100% - 80%) = 2,000 requests/phút (giảm 80%).\n2. Không thể tăng lên 160% vì Hit rate tối đa là 100%, và theo quy luật Pareto (80/20), việc tăng RAM thêm sẽ chạm ngưỡng bão hòa tăng ích giảm dần.'
+    : isDatabase
+    ? '1. Database Optimizer sẽ chọn Full Table Scan thay vì dùng Index.\n2. Vì Selectivity quá thấp (90% dữ liệu thỏa mãn), việc tra qua B-Tree Index rồi đọc ngẫu nhiên (Random I/O) từng block dữ liệu tốn kém hơn nhiều so với việc đọc tuần tự liên tục (Sequential I/O) toàn bộ bảng.'
     : '1. Dựa trên các nguyên tắc nêu trong tài liệu trích dẫn.\n2. Phân tích rõ các giả định và thông số kỹ thuật then chốt.';
 
   return {

@@ -860,6 +860,31 @@ footer span {
   text-transform: uppercase;
 }
 
+.btn-random-generate {
+  background: #ede6d4;
+  border: 1px solid #c9beaa;
+  color: #57462b;
+  font: 700 11.5px 'Manrope', sans-serif;
+  padding: 4px 10px;
+  border-radius: 4px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  transition: all 0.2s;
+}
+
+.btn-random-generate:hover:not(:disabled) {
+  background: #dfd4be;
+  border-color: #a8987b;
+  color: #172522;
+}
+
+.btn-random-generate:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
 .preset-docs-list {
   display: flex;
   flex-wrap: wrap;
