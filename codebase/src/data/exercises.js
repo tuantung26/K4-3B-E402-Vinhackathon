@@ -31,7 +31,18 @@ export const EXERCISES = [
         title: 'Chi phí tiềm ẩn & Hệ số dự phòng',
         content: 'Trong thực tế, ngoài input prompt từ người dùng, ứng dụng còn gửi kèm System Prompt, định dạng đối thoại, và nhận về output tokens. Vì vậy, các kỹ sư AI thường cộng thêm 20-30% dự phòng chi phí vận hành.'
       }
-    }
+    },
+    standard_answer: `Bước 1: Tính tổng số từ tiếng Việt:
+100 câu × 20 từ = 2,000 từ tiếng Việt.
+
+Bước 2: Ước tính hệ số tokenization tiếng Việt (§1.2):
+Do tiếng Việt là ngôn ngữ có dấu thanh Unicode UTF-8, thuật toán Byte-Pair Encoding (BPE) tách mỗi từ có dấu thành 2.0 - 3.0 tokens (chọn trung bình 2.5 tokens/từ).
+Tổng số tokens = 2,000 từ × 2.5 = 5,000 tokens (chấp nhận dải 4,000 - 6,000 tokens).
+
+Bước 3: Tính chi phí gọi API theo công thức chuẩn (§2.1):
+Mức giá niêm yết: $0.5 cho 1,000,000 (1 triệu) input tokens.
+Chi phí = (5,000 tokens / 1,000,000) × $0.5 = 0.005 × $0.5 = $0.0025 USD (hoặc khoảng $0.002 - $0.003 USD tùy hệ số).`,
+    standard_keywords: ['5000', '5,000', '4000', '6000', '0.0025', '$0.0025', '0.002', '0.003']
   },
   {
     id: 'linear-equation-01',
@@ -57,6 +68,16 @@ export const EXERCISES = [
         title: 'Quy tắc nhân hoặc chia với một số',
         content: 'Trong một phương trình, ta có thể nhân hoặc chia cả hai vế với cùng một số khác 0 để tìm nghiệm x: nếu ax = b (a ≠ 0) thì x = b / a.'
       }
-    }
+    },
+    standard_answer: `Bước 1: Chuyển hạng tử tự do (+5) từ vế trái sang vế phải và đổi dấu thành (-5) theo SEC-01:
+3x = 20 - 5
+3x = 15
+
+Bước 2: Chia cả hai vế của phương trình cho hệ số 3 để cô lập x theo SEC-02:
+x = 15 / 3
+x = 5.
+
+Kết luận: Nghiệm của phương trình là x = 5.`,
+    standard_keywords: ['x=5', 'x = 5']
   }
 ];

@@ -412,6 +412,34 @@ export default function App() {
                         <p style={{ margin: '6px 0 0' }}>{explanationResult.feedback}</p>
                       </div>
                     )}
+
+                    {/* MỞ KHÓA ĐÁP ÁN CHUẨN & LỜI GIẢI MẪU (GROUND TRUTH) */}
+                    {explanationResult?.is_satisfactory && currentExercise.standard_answer && (
+                      <div className="ground-truth-unlocked-card">
+                        <div className="gt-badge">
+                          <span>🎓 MỞ KHÓA LỜI GIẢI MẪU & ĐÁP ÁN CHUẨN</span>
+                          <span className="gt-tag">Ground Truth</span>
+                        </div>
+                        <p className="gt-note">
+                          Bạn đã hoàn thành trọn vẹn chu trình <em>"Làm trước - Hiểu lỗi sau - Phản tư sâu"</em>. Dưới đây là lời giải chuẩn xác để đối chiếu:
+                        </p>
+                        <div className="gt-content">
+                          {currentExercise.standard_answer}
+                        </div>
+                        {currentExercise.standard_keywords && currentExercise.standard_keywords.length > 0 && (
+                          <div className="gt-keywords-row">
+                            <span style={{ font: '600 11px "DM Mono", monospace', color: 'var(--muted)' }}>
+                              TỪ KHÓA / ĐÁP SỐ CHẤP NHẬN:
+                            </span>
+                            <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap', marginTop: '4px' }}>
+                              {currentExercise.standard_keywords.map((kw, i) => (
+                                <span key={i} className="gt-keyword-pill">{kw}</span>
+                              ))}
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    )}
                   </div>
                 )}
               </div>
@@ -593,6 +621,46 @@ export default function App() {
                       </div>
                     </>
                   )}
+
+                  {/* KHỐI HIỂN THỊ & CHỈNH SỬA ĐÁP ÁN CHUẨN (GROUND TRUTH) */}
+                  <div className="preview-ground-truth-box">
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
+                      <span style={{ font: '700 12px "DM Mono", monospace', color: '#1f634e' }}>
+                        📗 LỜI GIẢI MẪU & ĐÁP ÁN CHUẨN (GROUND TRUTH)
+                      </span>
+                      <span style={{ fontSize: '11px', color: '#1f634e', background: '#eef7ee', padding: '2px 8px', borderRadius: '4px', border: '1px solid #b9e5c9' }}>
+                        🔒 Giấu kín (No-spoiler) khi học sinh làm bài
+                      </span>
+                    </div>
+                    <p style={{ fontSize: '12px', color: '#556561', margin: '0 0 8px', lineHeight: 1.5 }}>
+                      AI dùng đáp án này làm mốc so khớp ngầm để phát hiện ngộ nhận và điều hướng gợi ý Socratic. Bạn có thể xem và chỉnh sửa trực tiếp bên dưới:
+                    </p>
+                    <textarea
+                      className="preview-gt-textarea"
+                      value={generatedExercise.standard_answer || ''}
+                      onChange={(e) => setGeneratedExercise({
+                        ...generatedExercise,
+                        standard_answer: e.target.value
+                      })}
+                      rows={4}
+                      placeholder="Lời giải mẫu chi tiết từng bước..."
+                    />
+                    <div style={{ marginTop: '10px' }}>
+                      <label style={{ display: 'block', font: '600 11px "DM Mono", monospace', color: '#4b5563', marginBottom: '4px' }}>
+                        DẢI TỪ KHÓA / ĐÁP SỐ CHẤP NHẬN (cách nhau bởi dấu phẩy):
+                      </label>
+                      <input
+                        type="text"
+                        className="preview-gt-input"
+                        value={(generatedExercise.standard_keywords || []).join(', ')}
+                        onChange={(e) => setGeneratedExercise({
+                          ...generatedExercise,
+                          standard_keywords: e.target.value.split(',').map(s => s.trim()).filter(Boolean)
+                        })}
+                        placeholder="VD: 12, 13, 20%, 25%"
+                      />
+                    </div>
+                  </div>
 
                   <div style={{ marginTop: '20px', textAlign: 'right' }}>
                     <button className="btn-apply-generated" onClick={handleApplyGeneratedExercise}>

@@ -75,7 +75,8 @@ YÊU CẦU ĐẦU RA (Trả về định dạng JSON DUY NHẤT):
       "cited_section": "§1.2"
     }
   ],
-  "standard_keywords": ["từ khóa số 1", "từ khóa số 2", "đáp án đúng"],
+  "standard_answer": "Lời giải mẫu chi tiết từng bước và kết quả chuẩn xác",
+  "standard_keywords": ["từ khóa hoặc dải số 1", "từ khóa 2", "đáp án đúng"],
   "reflection_prompt": "Câu hỏi đào sâu bản chất ở Bước 9",
   "reflection_keywords": ["từ khóa bản chất 1", "từ khóa bản chất 2"]
 }`
@@ -116,6 +117,7 @@ function formatGeneratedExercise(aiResult, originalDoc) {
       '§1.1': { title: 'Tổng quan khái niệm', content: originalDoc.slice(0, 300) }
     },
     misconceptions: aiResult.misconceptions || [],
+    standard_answer: aiResult.standard_answer || '1. Tính toán theo công thức giáo trình.\n2. Nêu rõ giả định và đơn vị quy đổi.',
     standard_keywords: aiResult.standard_keywords || [],
     reflectionPrompt: aiResult.reflection_prompt || 'Hãy giải thích ngắn: Vì sao lúc đầu bạn lại mắc phải sai lầm đó?',
     reflection_keywords: aiResult.reflection_keywords || [],
@@ -234,6 +236,12 @@ Dựa trên tài liệu bạn vừa cung cấp về "${title}":
     reflectionKeywords = ['hiểu bản chất', 'đối chiếu', 'tài liệu'];
   }
 
+  const standardAnswer = isRAG 
+    ? '1. Bước trượt stride = 500 - 100 = 400 tokens.\nSố chunk thực tế = ceil((5000 - 500) / 400) + 1 = 12 hoặc 13 chunks (tùy xử lý biên).\n2. Tổng số tokens embedding lưu trữ tăng thêm 20-25% do 100 tokens gối đầu ở mỗi phân đoạn.'
+    : isAttention
+    ? '1. Chi phí FLOPs tăng theo hàm bậc hai O(N^2). Khi N tăng gấp 3 lần thì ma trận Attention Q x K^T tăng 3^2 = 9 lần.\n2. Bộ nhớ VRAM lưu trữ ma trận điểm N x N cũng tăng gấp 9 lần.'
+    : '1. Dựa trên các nguyên tắc nêu trong tài liệu trích dẫn.\n2. Phân tích rõ các giả định và thông số kỹ thuật then chốt.';
+
   return {
     id: 'ex_auto_' + Date.now(),
     track: 'TRACK D2 · SINH ĐỀ TỰ ĐỘNG TỪ TÀI LIỆU',
@@ -241,6 +249,7 @@ Dựa trên tài liệu bạn vừa cung cấp về "${title}":
     prompt,
     documents: sections,
     misconceptions,
+    standard_answer: standardAnswer,
     standard_keywords: standardKeywords,
     reflectionPrompt: 'Hãy giải thích ngắn: Vì sao lúc đầu bạn lại nhầm lẫn hoặc tính toán chưa đúng?',
     reflection_keywords: reflectionKeywords,
