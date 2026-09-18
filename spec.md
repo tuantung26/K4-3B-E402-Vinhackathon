@@ -63,7 +63,7 @@ Loại: [ ] Tối ưu tính năng có sẵn  [x] Tính năng mới
   3. Không tự động cung cấp lời giải hoàn chỉnh ngay sau lần nộp đầu tiên.
   4. Không lưu trữ thông tin định danh cá nhân (PII) của học viên.
 - **Mức prototype nhắm tới:** `[x] Working Prototype`
-  - *Phần thật:* Giao diện web tương tác thời gian thực (Streamlit UI); tích hợp gọi API mô hình ngôn ngữ lớn (Gemini 2.5 Flash); chấm bài và phân tích lỗi động theo 4 lớp chỗ khó; thẩm định giải thích bản chất thật; tự động tính số đo chất lượng phiên.
+  - *Phần thật:* Giao diện web tương tác thời gian thực hiện đại bằng **React + Vite** (thiết kế theo phong cách báo chí, nền giấy kẻ ô ấm áp `#f5f1e8`, font DM Mono + Georgia italic); tích hợp module **AI Exercise & Ground Truth Generator** (cho phép tải tài liệu hoặc sinh ngẫu nhiên đề bài kèm cặp đáp án chuẩn); tích hợp gọi API mô hình ngôn ngữ lớn (Gemini 2.5 Flash); chấm bài và phân tích lỗi động theo 4 lớp chỗ khó; thẩm định giải thích bản chất thật; tự động tính số đo chất lượng phiên.
   - *Phần mock/fixture dự phòng:* 1 bài tập chuẩn (Tokenization tiếng Việt) và 3 sections tài liệu lý thuyết trích dẫn (§1.1, §1.2, §2.1); fallback offline heuristic rules khi mất kết nối mạng hoặc hết quota API.
 - **Automation:** `[x] Conditional`  
   *Lý do theo cost-of-error:* Nếu AI đoán bừa loại lỗi của học viên khi bài làm quá mơ hồ (cost-of-error cao: học viên bị dẫn đi sai hướng), hệ thống sẽ từ chối đưa gợi ý, dừng lại thông báo "chưa đủ căn cứ" và yêu cầu học viên nêu rõ các bước tính toán (theo HAX G10).
@@ -131,6 +131,11 @@ flowchart TD
 - **Correction (User sửa bài):** Sau gợi ý lần 1, học viên sửa lại đúng kết quả → Kích hoạt ngay bước hỏi giải thích nguyên nhân sai lầm ban đầu.
 - **Khi bị đòi ngoài phạm vi (③):** Học viên hỏi lạc đề sang kiến thức khác (ví dụ: hỏi code Python, hỏi loại tokenizer) → AI lịch sự từ chối và hướng sự tập trung quay lại bài toán token tiếng Việt.
 - **Case đặc thù domain (④):** Học viên sử dụng hệ số token dao động hợp lý (2.0 - 3.0 token/từ tiếng Việt) → Hệ thống chấp nhận dung sai kết quả trong khoảng hợp lệ.
+- **Vòng đời Đáp án chuẩn (Ground Truth Lifecycle & No-spoiler Guardrail):**
+  - *Sinh cặp đồng thời (Dual Generation):* Khi AI sinh đề bài (ngẫu nhiên hoặc từ tài liệu người dùng tải lên), AI luôn tự giải bài toán đó qua Chain-of-Thought để sinh trọn vẹn: Đề bài (`prompt`), Tài liệu trích dẫn (`§1.1`, `§1.2`), Bẫy ngộ nhận (`misconceptions`), và Đáp án chuẩn (`standard_answer` + `standard_keywords`).
+  - *Human-in-the-Loop:* Cho phép người dạy/người dùng xem và tùy chỉnh trực tiếp Lời giải mẫu và dải dung sai trước khi bắt đầu phiên làm bài.
+  - *No-spoiler Shield:* Trong suốt quá trình làm bài và sửa bài, Đáp án chuẩn được khóa kín đối với học viên, chỉ dùng ngầm làm mốc chẩn đoán lỗi.
+  - *Post-Reflection Unlock:* Chỉ khi học viên sửa đúng và vượt qua Bước 9 (Phản tư sâu đạt yêu cầu), hệ thống mới chính thức mở khóa toàn văn Lời giải mẫu chuẩn (Ground Truth) để đối chiếu, củng cố mô hình tư duy.
 
 ---
 
@@ -163,10 +168,11 @@ flowchart TD
 
 - **TỰ KHAI PHẦN CHƯA XONG (Self-disclosure of Incomplete Work — Theo quy định CP4 Sổ tay):**
   - [x] Đã hoàn thành: Luồng làm bài, phân tích lỗi 4 lớp, guardrail chống lộ đáp án, bộ test 22 cases tại `eval/golden_set.json`, script runner `eval/run_eval.py`.
-  - [ ] **Chưa hoàn thành 1:** Mới triển khai cố định trên 1 bài tập đơn lẻ (Tokenization tiếng Việt); chưa mở rộng ra kho bài tập nhiều chương/nhiều môn.
-  - [ ] **Chưa hoàn thành 2:** Giao diện chưa tích hợp bộ mô phỏng Tokenizer trực quan (chưa có visualizer tách subword BPE màu sắc theo thời gian thực).
-  - [ ] **Chưa hoàn thành 3:** Giới hạn vòng lặp sửa bài ở 2 lượt gợi ý; chưa có cơ chế thích ứng cá nhân hóa theo lịch sử học tập dài hạn.
-  - [ ] **Chưa hoàn thành 4:** Thử nghiệm người dùng ngoài nhóm (Willing users) — Đã liên hệ 3 bạn, sẽ tiến hành ghi nhật ký và phỏng vấn tại mốc CP5 (Khối Rubric R6).
+  - [x] Đã hoàn thành: Nâng cấp toàn diện giao diện sang **React + Vite** (phong cách báo chí DM Mono + Georgia), mở cổng LAN 0.0.0.0:3000 và link tunnel online.
+  - [x] Đã hoàn thành: Module Tải tài liệu & AI Sinh đề ngẫu nhiên kèm cặp **Đáp án chuẩn (Ground Truth Pair-Generation)** và mở khóa lời giải mẫu sau Bước 9.
+  - [ ] **Chưa hoàn thành 1:** Mở rộng cơ chế lưu trữ lịch sử học tập dài hạn (Long-term persistent learner state).
+  - [ ] **Chưa hoàn thành 2:** Giao diện chưa tích hợp visualizer đồ họa tách subword BPE đa màu sắc.
+  - [ ] **Chưa hoàn thành 3:** Giới hạn vòng lặp sửa bài ở 2 lượt gợi ý; chưa có cơ chế gợi ý phân nhánh sâu theo đồ thị kỹ năng.
 
 ---
 
@@ -195,3 +201,5 @@ flowchart TD
 | **17/9 · 16:00 (CP3)** | Tích hợp Gemini 2.5 Flash, chạy kiểm thử Golden Set 22 cases, quay video 30 giây. | Đạt kết quả thực tế 15/22 (68.2%), phân tích chi tiết 7 ca lỗi (trích dẫn chồng lấn, vùng mờ mơ hồ, khắt khe sư phạm). |
 | **18/9 · 21:00 (CP4)** | Chốt toàn diện `spec.md` tại thư mục gốc, chuẩn hóa `eval/golden_set.json` (22 cases), khóa chuẩn "Đạt" (Quality Bar ≥75% + 3 tiêu chí cứng), tự khai 4 hạng mục chưa hoàn thành, cập nhật phân công 4 thành viên (bổ sung Trần Văn Khánh). | Đáp ứng 100% yêu cầu mốc CP4 theo Sổ tay học viên Hackathon (trang 9, 11, 15), chuẩn bị sẵn sàng cho CP5 và CP6. |
 | **18/9 · 22:30 (CP5)** | Tinh chỉnh giao diện tra cứu trực tiếp tài liệu (§1.1 - §2.2), làm nổi bật nút nộp bài sửa, bổ sung gợi ý dẫn dắt ở bước Reflection. | Phản hồi từ 5 người dùng thử tại `validation/` (Trần Minh Đức kẹt nút nộp, Phạm Thu Hà muốn đọc tài liệu mở rộng, Vũ Hoàng Linh cần gợi ý câu trả lời bản chất). Giữ nguyên cơ chế No-spoiler và HAX G10 vì đảm bảo tính sư phạm. |
+| **18/9 · 23:45 (CP5+)** | Tích hợp cơ chế **Sinh đề ngẫu nhiên kèm Cặp Đáp án chuẩn (Ground Truth Dual Generation)**: AI tự động sinh Đề bài + Lời giải mẫu chi tiết + Dải dung sai số + Bẫy ngộ nhận; bổ sung giao diện Human-in-the-Loop xem/sửa đáp án chuẩn và thẻ mở khóa lời giải mẫu sau Bước 9. | Phản hồi của người dùng: Khi AI sinh đề bài ngẫu nhiên, hệ thống bắt buộc phải tự động tạo đáp án chuẩn tương ứng để chấm bài, bắt bẫy ngộ nhận và làm mốc đối chiếu khi hoàn thành bài phản tư. |
+
