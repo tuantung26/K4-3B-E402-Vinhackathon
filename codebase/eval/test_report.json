@@ -1,8 +1,8 @@
 {
   "summary": {
-    "passed": 10,
+    "passed": 8,
     "total": 10,
-    "pct": 100.0,
+    "pct": 80.0,
     "quality_bar_65": true
   },
   "results": [
@@ -14,7 +14,7 @@
       "details": "OK - tat ca khop",
       "got_status": "incorrect",
       "got_section": "§1.2",
-      "hint_preview": "Bạn hãy xem lại mối quan hệ giữa 'từ tiếng Việt' và 'tokens' trong tài"
+      "hint_preview": "Gợi ý: Thuật toán Subword của LLM xử lý các ngôn ngữ có dấu thanh như "
     },
     {
       "id": "TC-02",
@@ -24,7 +24,7 @@
       "details": "OK - tat ca khop",
       "got_status": "incorrect",
       "got_section": "§1.2",
-      "hint_preview": "Bạn hãy xem lại hệ số chuyển đổi từ tiếng Việt sang tokens. Tiếng Việt"
+      "hint_preview": "Gợi ý: Thuật toán Subword của LLM xử lý các ngôn ngữ có dấu thanh như "
     },
     {
       "id": "TC-03",
@@ -34,7 +34,7 @@
       "details": "OK - tat ca khop",
       "got_status": "incorrect",
       "got_section": "§2.1",
-      "hint_preview": "Hãy kiểm tra lại mẫu số quy đổi khi tính chi phí từ số tokens, đặc biệ"
+      "hint_preview": "Gợi ý: Hãy xem lại công thức quy đổi chi phí trên mỗi 1 triệu (1,000,0"
     },
     {
       "id": "TC-04",
@@ -44,27 +44,27 @@
       "details": "OK - tat ca khop",
       "got_status": "incorrect",
       "got_section": "§2.1",
-      "hint_preview": "Bạn đã tính toán số tokens và chi phí cho một câu. Hãy xem xét lại yêu"
+      "hint_preview": "Gợi ý: Hãy xem lại công thức quy đổi chi phí trên mỗi 1 triệu (1,000,0"
     },
     {
       "id": "TC-05",
       "layer": "Lop 3 - Thieu can cu",
       "desc": "Nhap ky tu rac (bo cuoc)",
-      "passed": true,
-      "details": "OK - tat ca khop",
-      "got_status": "insufficient_evidence",
-      "got_section": null,
-      "hint_preview": ""
+      "passed": false,
+      "details": "status exp=insufficient_evidence got=incorrect",
+      "got_status": "incorrect",
+      "got_section": "§2.1",
+      "hint_preview": "Gợi ý: Hãy xem lại công thức quy đổi chi phí trên mỗi 1 triệu (1,000,0"
     },
     {
       "id": "TC-06",
       "layer": "Lop 3 - Thieu can cu",
       "desc": "Doan so khong co buoc tinh",
-      "passed": true,
-      "details": "OK - tat ca khop",
-      "got_status": "insufficient_evidence",
-      "got_section": null,
-      "hint_preview": ""
+      "passed": false,
+      "details": "status exp=insufficient_evidence got=incorrect",
+      "got_status": "incorrect",
+      "got_section": "§2.1",
+      "hint_preview": "Gợi ý: Hãy xem lại công thức quy đổi chi phí trên mỗi 1 triệu (1,000,0"
     },
     {
       "id": "TC-07",
@@ -74,7 +74,7 @@
       "details": "OK - tat ca khop",
       "got_status": "correct",
       "got_section": null,
-      "hint_preview": ""
+      "hint_preview": "Chính xác! Bạn đã ước lượng đúng đặc thù tokenization tiếng Việt và ch"
     },
     {
       "id": "TC-08",

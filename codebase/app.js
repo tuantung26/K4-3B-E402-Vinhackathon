@@ -1,11 +1,29 @@
 const state = { attempts: 0, correct: 0, hintCount: 0 };
 const $ = selector => document.querySelector(selector);
+const escapeHtml = value => String(value ?? '').replace(/[&<>"']/g, character => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' })[character]);
+
+function updateAnswerCount() {
+  $('#answer-count').textContent = `${$('#answer').value.length} / 2000`;
+}
 
 async function init() {
-  const response = await fetch('/api/exercise');
-  const data = await response.json();
-  $('#exercise-title').textContent = data.exercise.title;
-  $('#exercise-prompt').textContent = data.exercise.prompt;
+  try {
+    const [exerciseResponse, evalResponse] = await Promise.all([
+      fetch('/api/exercise'),
+      fetch('/api/eval')
+    ]);
+    if (!exerciseResponse.ok || !evalResponse.ok) throw new Error('Không tải được dữ liệu app');
+    const [data, evaluation] = await Promise.all([exerciseResponse.json(), evalResponse.json()]);
+    $('#exercise-title').textContent = data.exercise.title;
+    $('#exercise-prompt').textContent = data.exercise.prompt;
+    $('#eval-total-label').textContent = `${evaluation.total} bài làm trong golden set`;
+    $('#run-eval').textContent = `Chạy ${evaluation.total} ca đo ↗`;
+    updateAnswerCount();
+  } catch (error) {
+    $('#exercise-title').textContent = 'Không tải được bài tập';
+    $('#exercise-prompt').textContent = 'Hãy kiểm tra server rồi tải lại trang.';
+    $('#eval-result').textContent = 'Chưa kết nối được bộ đo';
+  }
 }
 
 function render(result) {
@@ -17,9 +35,9 @@ function render(result) {
   $('#engine').textContent = ['openai', 'gemini'].includes(result.provider) ? 'AI thật' : 'Fixture';
   panel.innerHTML = `<div class="result-label">${isCorrect ? 'ĐÃ HIỂU' : result.status === 'uncertain' ? 'CHƯA ĐỦ CĂN CỨ' : `GỢI Ý ${state.hintCount + 1} / 2`}</div>
     <h3>${isCorrect ? 'Bạn đã tự sửa đúng.' : result.status === 'uncertain' ? 'Mình chưa thể kết luận.' : 'Mình thấy một điểm cần xem lại.'}</h3>
-    <p class="feedback-copy">${result.feedback || 'Hãy bổ sung thêm một bước để mình có đủ căn cứ phân tích.'}</p>
-    ${result.hint ? `<div class="feedback-box"><strong>GỢI Ý DẪN ĐƯỜNG</strong><p>${result.hint}</p></div>` : ''}
-    ${result.source ? `<div class="source"><strong>${result.source.id} · ${result.source.title}</strong><br>${result.source.content}</div>` : ''}
+    <p class="feedback-copy">${escapeHtml(result.feedback || 'Hãy bổ sung thêm một bước để mình có đủ căn cứ phân tích.')}</p>
+    ${result.hint ? `<div class="feedback-box"><strong>GỢI Ý DẪN ĐƯỜNG</strong><p>${escapeHtml(result.hint)}</p></div>` : ''}
+    ${result.source ? `<div class="source"><strong>${escapeHtml(result.source.id)} · ${escapeHtml(result.source.title)}</strong><br>${escapeHtml(result.source.content)}</div>` : ''}
     ${result.explanationPrompt ? '<div class="feedback-box explanation"><strong>BƯỚC CUỐI</strong><p>Hãy giải thích ngắn: lúc đầu bạn đã nhầm ở bước nào?</p><textarea id="explanation" placeholder="Mình đã nhầm vì..."></textarea><button class="continue" id="check-explanation">Kiểm tra giải thích</button><p id="explanation-result"></p></div>' : ''}`;
   if (result.explanationPrompt) {
     $('#check-explanation').addEventListener('click', async () => {
@@ -36,6 +54,8 @@ function render(result) {
 async function logSession(status, hintCount, explanationAccepted) {
   await fetch('/api/session-log', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ status, hintCount, explanationAccepted }) });
 }
+
+$('#answer').addEventListener('input', updateAnswerCount);
 
 $('#submit').addEventListener('click', async () => {
   const answer = $('#answer').value.trim();
@@ -57,7 +77,7 @@ $('#submit').addEventListener('click', async () => {
   }
 });
 
-$('#reset').addEventListener('click', () => { $('#answer').value = ''; state.hintCount = 0; $('#feedback').className = 'feedback-panel'; $('#feedback').innerHTML = '<div class="empty-state"><span class="empty-icon">✦</span><h3>Phản hồi sẽ xuất hiện ở đây</h3><p>Hãy làm bài theo cách bạn nghĩ trước.</p></div>'; });
+$('#reset').addEventListener('click', () => { $('#answer').value = ''; state.hintCount = 0; updateAnswerCount(); $('#feedback').className = 'feedback-panel'; $('#feedback').innerHTML = '<div class="empty-state"><span class="empty-icon">✦</span><h3>Phản hồi sẽ xuất hiện ở đây</h3><p>Hãy làm bài theo cách bạn nghĩ trước.</p></div>'; });
 $('#run-eval').addEventListener('click', async () => {
   $('#run-eval').disabled = true;
   $('#eval-result').textContent = 'Đang chạy...';
