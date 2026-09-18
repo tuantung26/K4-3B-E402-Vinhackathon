@@ -47,6 +47,11 @@
   npm run dev
   ```
 
+### 🎬 Checkpoint 5 (CP5) — Video Demo & Slide Thuyết trình
+- **Video Demo Thao tác Ứng dụng:** [`demo/demo-video.webm`](file:///home/k/Desktop/hackthon/K4-3B-E402-Vinhackathon/demo/demo-video.webm) (Đầy đủ 6 bước: Lỗi Lớp 1 -> Mơ hồ HAX G10 -> Tự sửa đúng -> Bước 9 Phản tư mở khóa Ground Truth -> Kiểm nghiệm 22 cases Golden Set -> Tải tài liệu AI Sinh đề & Đáp án chuẩn).
+- **Slide Pitch CP5 (Interactive HTML):** [`demo/index.html`](file:///home/k/Desktop/hackthon/K4-3B-E402-Vinhackathon/demo/index.html) hoặc [`demo/demo-slides.html`](file:///home/k/Desktop/hackthon/K4-3B-E402-Vinhackathon/demo/demo-slides.html) (Hỗ trợ phím mũi tên, trình chiếu toàn màn hình và in/lưu PDF).
+- **Slide Pitch Markdown:** [`demo/demo-slides.md`](file:///home/k/Desktop/hackthon/K4-3B-E402-Vinhackathon/demo/demo-slides.md) (Chuẩn khung 6 slide theo Rubric Hackathon).
+
 ---
 
 - Thời lượng: **47,5 giờ** từ phát đề đến thuyết trình (ca 3A) — LAB 5 (phát đề + build) · LEC 6 (tiếp tục build theo ca) · LAB 6 (vòng thi)
