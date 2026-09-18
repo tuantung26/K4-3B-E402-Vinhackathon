@@ -2,8 +2,8 @@
 
 **Dự án:** Adaptive AI Tutor — Học Từ Lỗi Trước  
 **Track:** D · D2 — Học từ lỗi trước (Làm bài trước khi học lý thuyết)  
-**Nhóm:** K4-3B-E402 · Lớp 3A  
-**Thành viên:** Ngô Tuấn Tùng (Lead) · Đào Thị Huyền (AI & Prompt) · Nguyễn Huy Cương (Evidence & Task)  
+**Nhóm:** K4-3B-E402 · Lớp 3B  
+**Thành viên:** Ngô Tuấn Tùng (Lead) · Đào Thị Huyền (AI & Prompt) · Nguyễn Huy Cương (Evidence & Task) · Trần Văn Khánh (Testing & Eval)  
 **File ứng dụng:** [codebase/app.py](file:///c:/Users/Hi/OneDrive/Documents/GitHub/K4-3B-E402-Vinhackathon/codebase/app.py) & [codebase/engine.py](file:///c:/Users/Hi/OneDrive/Documents/GitHub/K4-3B-E402-Vinhackathon/codebase/engine.py)
 
 ---

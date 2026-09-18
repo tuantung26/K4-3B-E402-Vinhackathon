@@ -1,0 +1,162 @@
+{
+  "total": 22,
+  "passed": 22,
+  "accuracy_pct": 100.0,
+  "quality_bar_met": true,
+  "results": [
+    {
+      "id": "case_01",
+      "layer": "Lớp 1 - Khái niệm sai lệch",
+      "description": "Coi 1 từ tiếng Việt = 1 token",
+      "passed": true,
+      "details": "OK"
+    },
+    {
+      "id": "case_02",
+      "layer": "Lớp 1 - Khái niệm sai lệch",
+      "description": "Coi 1 từ = 1 token, nhân 0.5 chia 1M",
+      "passed": true,
+      "details": "OK"
+    },
+    {
+      "id": "case_03",
+      "layer": "Lớp 1 - Khái niệm sai lệch",
+      "description": "Áp dụng hệ số tiếng Anh 1.3x cho tiếng Việt",
+      "passed": true,
+      "details": "OK"
+    },
+    {
+      "id": "case_04",
+      "layer": "Lớp 1 - Khái niệm sai lệch",
+      "description": "Coi 1 ký tự/chữ cái = 1 token",
+      "passed": true,
+      "details": "OK"
+    },
+    {
+      "id": "case_05",
+      "layer": "Lớp 2 - Lỗi công thức & đơn vị",
+      "description": "Sai mẫu số quy đổi (chia 1,000 thay vì 1,000,000)",
+      "passed": true,
+      "details": "OK"
+    },
+    {
+      "id": "case_06",
+      "layer": "Lớp 2 - Lỗi công thức & đơn vị",
+      "description": "Quên nhân số lượng 100 câu (chỉ tính 1 câu)",
+      "passed": true,
+      "details": "OK"
+    },
+    {
+      "id": "case_07",
+      "layer": "Lớp 2 - Lỗi công thức & đơn vị",
+      "description": "Đảo ngược phép tính chi phí (chia đơn giá nhân 1 triệu)",
+      "passed": true,
+      "details": "OK"
+    },
+    {
+      "id": "case_08",
+      "layer": "Lớp 3 - Mơ hồ / Thiếu căn cứ",
+      "description": "Gõ ký tự ngẫu nhiên rác",
+      "passed": true,
+      "details": "OK"
+    },
+    {
+      "id": "case_09",
+      "layer": "Lớp 3 - Mơ hồ / Thiếu căn cứ",
+      "description": "Đoán cảm tính không có số liệu",
+      "passed": true,
+      "details": "OK"
+    },
+    {
+      "id": "case_10",
+      "layer": "Lớp 3 - Mơ hồ / Thiếu căn cứ",
+      "description": "Học viên bỏ cuộc, không trình bày bài làm",
+      "passed": true,
+      "details": "OK"
+    },
+    {
+      "id": "case_11",
+      "layer": "Lớp 3 - Mơ hồ / Thiếu căn cứ",
+      "description": "Đoán mò không đưa ra bước tính trung gian",
+      "passed": true,
+      "details": "OK"
+    },
+    {
+      "id": "case_12",
+      "layer": "Happy Path",
+      "description": "Bài làm hoàn chỉnh chuẩn xác (hệ số 2.5x)",
+      "passed": true,
+      "details": "OK"
+    },
+    {
+      "id": "case_13",
+      "layer": "Happy Path",
+      "description": "Bài làm đúng ở dải biên dưới (hệ số 2.0x)",
+      "passed": true,
+      "details": "OK"
+    },
+    {
+      "id": "case_14",
+      "layer": "Happy Path",
+      "description": "Bài làm đúng ở dải biên trên (hệ số 3.0x)",
+      "passed": true,
+      "details": "OK"
+    },
+    {
+      "id": "case_15",
+      "layer": "Lớp 4 - Reflection (Giải thích bản chất)",
+      "description": "Giải thích sâu sắc về cơ chế BPE và thanh điệu Unicode",
+      "passed": true,
+      "details": "OK"
+    },
+    {
+      "id": "case_16",
+      "layer": "Lớp 4 - Reflection (Giải thích bản chất)",
+      "description": "Giải thích đúng sai sót đơn vị quy đổi 1M tokens",
+      "passed": true,
+      "details": "OK"
+    },
+    {
+      "id": "case_17",
+      "layer": "Lớp 4 - Reflection (Giải thích bản chất)",
+      "description": "Giải thích chép vẹt, đối phó theo AI",
+      "passed": true,
+      "details": "OK"
+    },
+    {
+      "id": "case_18",
+      "layer": "Lớp 4 - Reflection (Giải thích bản chất)",
+      "description": "Giải thích đối phó, đoán bừa",
+      "passed": true,
+      "details": "OK"
+    },
+    {
+      "id": "case_19",
+      "layer": "Cases biên & hiếm",
+      "description": "Chỉ đưa số kết quả không có bước giải (yêu cầu sư phạm giải thích)",
+      "passed": true,
+      "details": "OK"
+    },
+    {
+      "id": "case_20",
+      "layer": "Cases biên & hiếm",
+      "description": "Chỉ trả lời nửa câu (thiếu phần tính chi phí)",
+      "passed": true,
+      "details": "OK"
+    },
+    {
+      "id": "case_21",
+      "layer": "Cases biên & hiếm",
+      "description": "Ước lượng thổi phồng quá mức (1 từ = 10 tokens)",
+      "passed": true,
+      "details": "OK"
+    },
+    {
+      "id": "case_22",
+      "layer": "Cases biên & hiếm",
+      "description": "Học viên hỏi lạc đề / vặn lại mô hình tokenizer",
+      "passed": true,
+      "details": "OK"
+    }
+  ]
+}
