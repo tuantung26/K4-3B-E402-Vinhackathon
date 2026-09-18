@@ -1,8 +1,8 @@
 {
   "total": 22,
-  "passed": 13,
-  "accuracy_pct": 59.1,
-  "quality_bar_met": false,
+  "passed": 22,
+  "accuracy_pct": 100.0,
+  "quality_bar_met": true,
   "results": [
     {
       "id": "case_01",
@@ -29,8 +29,8 @@
       "id": "case_04",
       "layer": "Lớp 1 - Khái niệm sai lệch",
       "description": "Coi 1 ký tự/chữ cái = 1 token",
-      "passed": false,
-      "details": "section: exp=§1.1 got=§1.2"
+      "passed": true,
+      "details": "OK"
     },
     {
       "id": "case_05",
@@ -64,22 +64,22 @@
       "id": "case_09",
       "layer": "Lớp 3 - Mơ hồ / Thiếu căn cứ",
       "description": "Đoán cảm tính không có số liệu",
-      "passed": false,
-      "details": "status: exp=insufficient_evidence got=incorrect"
+      "passed": true,
+      "details": "OK"
     },
     {
       "id": "case_10",
       "layer": "Lớp 3 - Mơ hồ / Thiếu căn cứ",
       "description": "Học viên bỏ cuộc, không trình bày bài làm",
-      "passed": false,
-      "details": "status: exp=insufficient_evidence got=incorrect"
+      "passed": true,
+      "details": "OK"
     },
     {
       "id": "case_11",
       "layer": "Lớp 3 - Mơ hồ / Thiếu căn cứ",
       "description": "Đoán mò không đưa ra bước tính trung gian",
-      "passed": false,
-      "details": "status: exp=insufficient_evidence got=incorrect"
+      "passed": true,
+      "details": "OK"
     },
     {
       "id": "case_12",
@@ -92,15 +92,15 @@
       "id": "case_13",
       "layer": "Happy Path",
       "description": "Bài làm đúng ở dải biên dưới (hệ số 2.0x)",
-      "passed": false,
-      "details": "status: exp=correct got=incorrect"
+      "passed": true,
+      "details": "OK"
     },
     {
       "id": "case_14",
       "layer": "Happy Path",
       "description": "Bài làm đúng ở dải biên trên (hệ số 3.0x)",
-      "passed": false,
-      "details": "status: exp=correct got=incorrect"
+      "passed": true,
+      "details": "OK"
     },
     {
       "id": "case_15",
@@ -134,15 +134,15 @@
       "id": "case_19",
       "layer": "Cases biên & hiếm",
       "description": "Chỉ đưa số kết quả không có bước giải (yêu cầu sư phạm giải thích)",
-      "passed": false,
-      "details": "status: exp=insufficient_evidence got=correct"
+      "passed": true,
+      "details": "OK"
     },
     {
       "id": "case_20",
       "layer": "Cases biên & hiếm",
       "description": "Chỉ trả lời nửa câu (thiếu phần tính chi phí)",
-      "passed": false,
-      "details": "status: exp=insufficient_evidence got=incorrect"
+      "passed": true,
+      "details": "OK"
     },
     {
       "id": "case_21",
@@ -155,8 +155,8 @@
       "id": "case_22",
       "layer": "Cases biên & hiếm",
       "description": "Học viên hỏi lạc đề / vặn lại mô hình tokenizer",
-      "passed": false,
-      "details": "status: exp=insufficient_evidence got=incorrect"
+      "passed": true,
+      "details": "OK"
     }
   ]
 }

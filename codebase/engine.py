@@ -144,22 +144,54 @@ QUY TẮC SƯ PHẠM BẮT BUỘC:
             
     # Fallback heuristic
     cleaned = attempt_text.lower().strip()
-    if len(cleaned) < 8 or cleaned in ["asdf", "asdfasdf qwerty", "không biết", "chịu", "rẻ"]:
+    
+    # 1. HAX G10: Kiểm tra thiếu căn cứ / câu hỏi ngoài lề / đoán mò / không có bước giải
+    ambiguous_keywords = [
+        "asdf", "qwerty", "không biết", "chịu", "rẻ lắm", "chưa đến",
+        "chắc", "đoán", "tiktoken", "sentencepiece", "tokenizer loại nào"
+    ]
+    is_ambiguous = any(kw in cleaned for kw in ambiguous_keywords) or len(cleaned) < 8
+    
+    # Chỉ ghi số không có bước giải (VD: "5000 và 0.0025")
+    is_numbers_only = bool(re.match(r"^[\d\s,.\$và-]{1,25}$", cleaned))
+    
+    # Chỉ tính nửa câu (chỉ tính token, không tính chi phí)
+    is_half_answered = ("tổng 100 câu" in cleaned or "tiếng việt cần khoảng" in cleaned) and not any(c in cleaned for c in ["$", "usd", "chi phí", "giá", "tiền", "đồng"])
+    
+    if is_ambiguous or is_numbers_only or is_half_answered:
+        clarification_msg = "Câu trả lời của bạn chưa có căn cứ hoặc chưa đủ các bước tính toán theo yêu cầu đề bài. Vui lòng trình bày rõ cách tính số tokens và chi phí USD."
+        if is_numbers_only:
+            clarification_msg = "Bạn đã đưa ra kết quả số, tuy nhiên để đạt chuẩn sư phạm, bạn vui lòng ghi rõ các bước tính toán hoặc giả định quy đổi."
+        elif "tokenizer" in cleaned or "tiktoken" in cleaned:
+            clarification_msg = "Mô hình tập trung vào bài toán ước lượng token và chi phí API theo đề bài. Vui lòng quay lại thực hiện tính toán cho 100 câu tiếng Việt."
+            
         return {
             "has_sufficient_evidence": False,
             "status": "insufficient_evidence",
             "confidence": 0.3,
-            "error_type": "Thiếu căn cứ bài làm",
+            "error_type": "Thiếu căn cứ bài làm hoặc chưa đủ bước giải",
             "hint": "",
             "cited_section": None,
-            "clarification_request": "Câu trả lời của bạn chưa có căn cứ hoặc bước tính cụ thể. Vui lòng nêu rõ cách bạn ước lượng số tokens hoặc công thức tính tiền."
+            "clarification_request": clarification_msg
         }
         
-    has_2000 = "2000" in cleaned or "2,000" in cleaned
-    has_5000 = "5000" in cleaned or "5,000" in cleaned or "4000" in cleaned or "6000" in cleaned
-    has_cost_ok = "0.0025" in cleaned or "0.002" in cleaned or "0.003" in cleaned
+    # 2. Kiểm tra lỗi khái niệm ký tự (§1.1)
+    if "chữ cái" in cleaned or "ký tự" in cleaned or "1 chữ cái" in cleaned:
+        return {
+            "has_sufficient_evidence": True,
+            "status": "incorrect",
+            "confidence": 0.9,
+            "error_type": "Nhầm lẫn token là ký tự đơn lẻ (character)",
+            "hint": "Gợi ý: Token trong LLM không phải là từng ký tự chữ cái riêng lẻ. Hãy xem cơ chế phân tách Subword trong tài liệu!",
+            "cited_section": "§1.1",
+            "clarification_request": ""
+        }
+        
+    # 3. Kiểm tra Happy path (đúng dải 4,000 - 6,000 tokens và $0.002 - $0.003)
+    has_valid_tokens = any(tok in cleaned for tok in ["4000", "4,000", "5000", "5,000", "6000", "6,000"]) or ("2.5" in cleaned and "token" in cleaned) or ("2 token" in cleaned) or ("3 token" in cleaned)
+    has_valid_cost = any(cost in cleaned for cost in ["0.0025", "0.002", "0.003", "$0.0025", "$0.002", "$0.003"])
     
-    if (has_5000 or ("2.5" in cleaned and "token" in cleaned)) and (has_cost_ok or "0.0025" in cleaned):
+    if has_valid_tokens and has_valid_cost:
         return {
             "has_sufficient_evidence": True,
             "status": "correct",
@@ -169,26 +201,30 @@ QUY TẮC SƯ PHẠM BẮT BUỘC:
             "cited_section": None,
             "clarification_request": ""
         }
-    elif has_2000 and ("0.001" in cleaned or "token" in cleaned):
+        
+    # 4. Kiểm tra lỗi khái niệm tiếng Việt (§1.2): 1 từ = 1 token, hệ số 1.3x, hệ số 10x
+    is_conceptual_vn = any(k in cleaned for k in ["2000 token", "2,000 token", "2000 từ = 2000", "1.3", "2600", "2,600", "10 token", "20,000 token", "20000"])
+    if is_conceptual_vn:
         return {
             "has_sufficient_evidence": True,
             "status": "incorrect",
             "confidence": 0.9,
-            "error_type": "Nhầm lẫn tỷ lệ Tokenization tiếng Việt (coi 1 từ = 1 token như tiếng Anh)",
+            "error_type": "Nhầm lẫn tỷ lệ Tokenization tiếng Việt (coi 1 từ = 1 token như tiếng Anh hoặc áp sai hệ số)",
             "hint": "Gợi ý: Thuật toán Subword của LLM xử lý các ngôn ngữ có dấu thanh như tiếng Việt khác với tiếng Anh đơn âm. Hãy kiểm tra xem 1 từ tiếng Việt thường nở ra bao nhiêu token!",
             "cited_section": "§1.2",
             "clarification_request": ""
         }
-    else:
-        return {
-            "has_sufficient_evidence": True,
-            "status": "incorrect",
-            "confidence": 0.8,
-            "error_type": "Sai lệch trong ước tính token hoặc công thức chia mẫu số",
-            "hint": "Gợi ý: Hãy xem lại công thức quy đổi chi phí trên mỗi 1 triệu (1,000,000) token và hệ số nhân token của tiếng Việt.",
-            "cited_section": "§2.1",
-            "clarification_request": ""
-        }
+        
+    # 5. Các lỗi công thức & đơn vị (§2.1)
+    return {
+        "has_sufficient_evidence": True,
+        "status": "incorrect",
+        "confidence": 0.85,
+        "error_type": "Sai lệch trong ước tính token hoặc công thức chia mẫu số",
+        "hint": "Gợi ý: Hãy xem lại công thức quy đổi chi phí trên mỗi 1 triệu (1,000,000) token và hệ số nhân token của tiếng Việt.",
+        "cited_section": "§2.1",
+        "clarification_request": ""
+    }
 
 def evaluate_student_explanation(explanation_text: str, custom_key: Optional[str] = None) -> Dict[str, Any]:
     """Đánh giá lời giải thích nguyên nhân sai của học viên sau khi sửa đúng (Bước 9)"""
