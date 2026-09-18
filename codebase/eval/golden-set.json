@@ -1,0 +1,22 @@
+[
+  {"id":"case-01","answer":"3x = 20 + 5; x = 25/3","expected":"incorrect","errorType":"Sai dau khi chuyen hang"},
+  {"id":"case-02","answer":"3x = 20 + 5 = 25; x = 25/3","expected":"incorrect","errorType":"Sai dau khi chuyen hang"},
+  {"id":"case-03","answer":"x = 25/3 vi chuyen 5 thanh +5","expected":"incorrect","errorType":"Sai dau khi chuyen hang"},
+  {"id":"case-04","answer":"3x = 15; x = 15","expected":"incorrect","errorType":"Chua chia cho he so cua x"},
+  {"id":"case-05","answer":"3x = 15 nen x = 15","expected":"incorrect","errorType":"Chua chia cho he so cua x"},
+  {"id":"case-06","answer":"3x = 15; em dung o day","expected":"incorrect","errorType":"Chua chia cho he so cua x"},
+  {"id":"case-07","answer":"x = 20 - 5 / 3","expected":"incorrect","errorType":"Sai thu tu bien doi"},
+  {"id":"case-08","answer":"x = 20 - 5/3 = 18.33","expected":"incorrect","errorType":"Sai thu tu bien doi"},
+  {"id":"case-09","answer":"x = 20 - 5 = 15 / 3","expected":"incorrect","errorType":"Sai thu tu bien doi"},
+  {"id":"case-10","answer":"5 = 20 - 3x","expected":"incorrect","errorType":"Bien doi chua hoan tat"},
+  {"id":"case-11","answer":"20 = 3x + 5, x = 20/3","expected":"incorrect","errorType":"Bien doi chua hoan tat"},
+  {"id":"case-12","answer":"3x + 5 = 15","expected":"incorrect","errorType":"Bien doi chua hoan tat"},
+  {"id":"case-13","answer":"3x + 5 = 20, x = 20 - 5","expected":"incorrect","errorType":"Chua chia cho he so cua x"},
+  {"id":"case-14","answer":"3x = 20 - 5; x = 15","expected":"incorrect","errorType":"Chua chia cho he so cua x"},
+  {"id":"case-15","answer":"3x = 25; x = 25/3","expected":"incorrect","errorType":"Sai dau khi chuyen hang"},
+  {"id":"case-16","answer":"x = 5/3","expected":"incorrect","errorType":"Sai dau khi chuyen hang"},
+  {"id":"case-17","answer":"3x = 20 - 5 = 15; x = 15 * 3","expected":"incorrect","errorType":"Sai phep toan nguoc"},
+  {"id":"case-18","answer":"x = 15 + 3","expected":"incorrect","errorType":"Sai phep toan nguoc"},
+  {"id":"case-19","answer":"3x = 15; x = 3/15","expected":"incorrect","errorType":"Sai phep toan nguoc"},
+  {"id":"case-20","answer":"Em khong biet, x chac la 25","expected":"incorrect","errorType":"Chua du can cu"}
+]
