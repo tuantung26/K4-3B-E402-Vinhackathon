@@ -146,7 +146,7 @@ export default function App() {
     }
   };
 
-  // Generate exercise from document
+  // Generate exercise & ground truth from document
   const handleGenerate = async (overrideContent = null) => {
     const targetContent = (typeof overrideContent === 'string' ? overrideContent : docContent).trim();
     if (!targetContent) {
@@ -161,11 +161,15 @@ export default function App() {
     try {
       setTimeout(() => {
         setGeneratorStatusText('Đang trích xuất khái niệm & phân chia section (§1.1, §1.2)...');
-      }, 700);
+      }, 500);
 
       setTimeout(() => {
-        setGeneratorStatusText('Đang thiết kế các bẫy ngộ nhận (Misconceptions) & Lời giải mẫu chuẩn...');
-      }, 1400);
+        setGeneratorStatusText('Đang thiết kế đề bài thực hành & giải Lời giải mẫu chuẩn...');
+      }, 1000);
+
+      setTimeout(() => {
+        setGeneratorStatusText('Đang thiết lập bẫy ngộ nhận (Misconceptions) & Socratic hints...');
+      }, 1600);
 
       const generated = await generateExerciseFromText(targetContent, apiKey);
       setTimeout(() => {
@@ -174,17 +178,9 @@ export default function App() {
         confetti({ particleCount: 50, spread: 60, origin: { y: 0.6 } });
       }, 2000);
     } catch (err) {
-      alert('Lỗi sinh bài tập: ' + err.message);
+      alert('Lỗi sinh bài tập & đáp án: ' + err.message);
       setIsGenerating(false);
     }
-  };
-
-  // Random exercise generator
-  const handleRandomGenerate = () => {
-    const randomDoc = SAMPLE_DOCUMENTS[Math.floor(Math.random() * SAMPLE_DOCUMENTS.length)];
-    setDocContent(randomDoc.content);
-    setFileName(randomDoc.title);
-    handleGenerate(randomDoc.content);
   };
 
   // Apply generated exercise to active session
@@ -514,17 +510,7 @@ export default function App() {
             <div className="modal-body">
               {/* Preset Sample Documents */}
               <div className="preset-docs-bar">
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
-                  <div className="preset-docs-label" style={{ margin: 0 }}>Chọn nhanh tài liệu mẫu có sẵn:</div>
-                  <button
-                    className="btn-random-generate"
-                    onClick={handleRandomGenerate}
-                    disabled={isGenerating}
-                    title="AI tự chọn ngẫu nhiên chủ đề và sinh đề + đáp án chuẩn tức thì"
-                  >
-                    🎲 Sinh đề ngẫu nhiên kèm đáp án chuẩn ↗
-                  </button>
-                </div>
+                <div className="preset-docs-label">Chọn nhanh tài liệu mẫu có sẵn:</div>
                 <div className="preset-docs-list">
                   {SAMPLE_DOCUMENTS.map((doc) => (
                     <button
@@ -596,10 +582,11 @@ export default function App() {
                 </span>
                 <button
                   className="btn-generate-main"
-                  onClick={handleGenerate}
+                  onClick={() => handleGenerate()}
                   disabled={isGenerating || !docContent.trim()}
+                  title="AI tự động phân tích nội dung, sinh đồng thời đề bài thực hành và Lời giải mẫu kèm Đáp án chuẩn (Ground Truth)"
                 >
-                  {isGenerating ? 'Đang phân tích & sinh đề...' : '✨ AI Sinh đề bài thực hành ↗'}
+                  {isGenerating ? 'Đang phân tích, sinh đề & đáp án...' : '✨ AI Sinh đề bài & Đáp án chuẩn ↗'}
                 </button>
               </div>
 
