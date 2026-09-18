@@ -185,8 +185,82 @@ export function analyzeMathAttempt(attemptText) {
   };
 }
 
+// Phân tích bài tập tự sinh từ tài liệu tùy chỉnh (AI Generated Exercise)
+export function analyzeCustomExerciseAttempt(attemptText, exercise) {
+  const cleaned = attemptText.toLowerCase().trim();
+
+  // 1. Kiểm tra thiếu căn cứ
+  const ambiguousKeywords = ["không biết", "chịu", "chắc", "đoán", "asdf", "qwerty", "tùy"];
+  if (cleaned.length < 8 || ambiguousKeywords.some(kw => cleaned.includes(kw))) {
+    return {
+      has_sufficient_evidence: false,
+      status: 'insufficient_evidence',
+      error_type: 'Chưa đủ căn cứ bài làm',
+      feedback: 'Câu trả lời của bạn chưa đủ căn cứ hoặc các bước suy luận. Hãy nêu rõ giả định hoặc công thức tính.',
+      hint: null,
+      cited_section: Object.keys(exercise.documents)[0] || '§1.1',
+      source: null,
+      explanationPrompt: false,
+      provider: 'ai-generated'
+    };
+  }
+
+  // 2. Kiểm tra ngộ nhận đã định nghĩa trong bài tập
+  if (exercise.misconceptions && exercise.misconceptions.length > 0) {
+    for (const m of exercise.misconceptions) {
+      if (cleaned.includes(m.keyword.toLowerCase())) {
+        const sec = exercise.documents[m.cited_section] || Object.values(exercise.documents)[0];
+        return {
+          has_sufficient_evidence: true,
+          status: 'incorrect',
+          error_type: m.error_type,
+          feedback: `Hệ thống phát hiện dấu hiệu ngộ nhận: ${m.error_type}.`,
+          hint: m.hint,
+          cited_section: m.cited_section,
+          source: sec ? { id: m.cited_section, title: sec.title, content: sec.content } : null,
+          explanationPrompt: false,
+          provider: 'ai-generated'
+        };
+      }
+    }
+  }
+
+  // 3. Kiểm tra đáp án chuẩn
+  if (exercise.standard_keywords && exercise.standard_keywords.length > 0) {
+    const isCorrect = exercise.standard_keywords.some(kw => cleaned.includes(kw.toLowerCase()));
+    if (isCorrect) {
+      return {
+        has_sufficient_evidence: true,
+        status: 'correct',
+        error_type: null,
+        feedback: 'Xuất sắc! Bạn đã đưa ra phân tích và kết quả chính xác theo đúng tài liệu lý thuyết.',
+        hint: null,
+        cited_section: null,
+        source: null,
+        explanationPrompt: true,
+        provider: 'ai-generated'
+      };
+    }
+  }
+
+  // 4. Mặc định chưa khớp
+  const firstSecKey = Object.keys(exercise.documents)[0] || '§1.1';
+  const firstDoc = exercise.documents[firstSecKey];
+  return {
+    has_sufficient_evidence: true,
+    status: 'incorrect',
+    error_type: 'Kết quả hoặc cách suy luận chưa chính xác',
+    feedback: 'Kết quả của bạn chưa hoàn toàn khớp với nguyên lý trong giáo trình. Hãy xem lại gợi ý từ tài liệu bên dưới.',
+    hint: 'Gợi ý: Đối chiếu kỹ các thông số đầu vào và định nghĩa then chốt trong đoạn trích lý thuyết.',
+    cited_section: firstSecKey,
+    source: firstDoc ? { id: firstSecKey, title: firstDoc.title, content: firstDoc.content } : null,
+    explanationPrompt: false,
+    provider: 'ai-generated'
+  };
+}
+
 // Đánh giá phản tư bản chất (Reflection Evaluation)
-export function evaluateReflection(explanationText, exerciseId) {
+export function evaluateReflection(explanationText, exerciseId, exercise = null) {
   const expLower = explanationText.toLowerCase().trim();
 
   if (exerciseId === 'ex_tokenization_vn_01') {
@@ -204,7 +278,7 @@ export function evaluateReflection(explanationText, exerciseId) {
         concept_grasped: "Chưa làm rõ được cơ chế ngôn ngữ đơn lập có dấu thanh."
       };
     }
-  } else {
+  } else if (exerciseId === 'linear-equation-01') {
     const isDeep = expLower.includes("đổi dấu") || expLower.includes("chuyển vế") || expLower.includes("-5") || expLower.includes("trừ 5");
     if (isDeep) {
       return {
@@ -217,6 +291,23 @@ export function evaluateReflection(explanationText, exerciseId) {
         is_satisfactory: false,
         feedback: "Hãy giải thích rõ hơn quy tắc toán học bạn đã áp dụng khi chuyển số 5 từ vế này sang vế kia.",
         concept_grasped: "Cần làm rõ quy tắc toán học."
+      };
+    }
+  } else {
+    // Bài tập tự sinh từ tài liệu
+    const refKeywords = exercise?.reflection_keywords || ['bản chất', 'nguyên lý', 'hiểu', 'công thức'];
+    const isDeep = refKeywords.some(k => expLower.includes(k.toLowerCase())) || expLower.length > 30;
+    if (isDeep) {
+      return {
+        is_satisfactory: true,
+        feedback: "Rất tốt! Bạn đã giải thích được bản chất nguyên lý thay vì chỉ nhớ kết quả số.",
+        concept_grasped: "Nắm vững cơ chế vận hành từ tài liệu."
+      };
+    } else {
+      return {
+        is_satisfactory: false,
+        feedback: "Giải thích của bạn còn hơi ngắn. Hãy đối chiếu thêm với nguyên tắc được nhắc tới trong các section tài liệu.",
+        concept_grasped: "Cần phân tích sâu hơn về mặt kỹ thuật."
       };
     }
   }

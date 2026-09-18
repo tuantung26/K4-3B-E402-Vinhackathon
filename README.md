@@ -15,6 +15,40 @@
 
 > Nhóm copy nguyên file README này về repo của mình, rồi điền bảng trên. Cột **Phần việc đảm nhiệm** ghi càng cụ thể càng tốt.
 
+---
+
+## 🌟 Dự án: Adaptive AI Tutor — Học từ lỗi trước (Track D2)
+
+### 📌 Vấn đề & Giải pháp
+- **Vấn đề cốt lõi:** 65% học viên có thói quen làm bài tập trước khi đọc lý thuyết, nhưng khi làm sai thì bị tắc tị, không biết đọc lại ở đâu. Nếu đọc đáp án mẫu ngay, học viên sinh tâm lý ỷ lại, nhớ vẹt kết quả và dễ tái phát lỗi ở bài sau.
+- **Giải pháp:** Adaptive AI Tutor áp dụng phương pháp Socratic:
+  1. Cho học sinh làm bài trước lý thuyết.
+  2. Khi sai, chẩn đoán lỗi theo 4 lớp chỗ khó, trích dẫn số hiệu tài liệu cụ thể (`§1.1`, `§1.2`, `§2.1`).
+  3. Đưa ra gợi ý gợi mở tư duy, **tuyệt đối không lộ đáp án số (No-spoiler Guardrail)**.
+  4. Yêu cầu học sinh tự sửa và giải thích bản chất nguyên nhân gốc rễ ở Bước 9 (Reflection).
+  5. Mở khóa toàn văn Lời giải mẫu chuẩn (Ground Truth) để đối chiếu sau khi hoàn thành.
+
+### ✨ Tính năng nổi bật: AI Exercise & Ground Truth Dual Generator
+- **Sinh đề ngẫu nhiên kèm Cặp Đáp án chuẩn:** Khi người dùng tải lên tài liệu học tập (PDF, TXT, MD) hoặc yêu cầu sinh đề ngẫu nhiên, AI tự động sinh trọn bộ:
+  - Đề bài thực hành (`prompt`) có số liệu và yêu cầu suy luận trước khi xem lý thuyết.
+  - Các đoạn lý thuyết trích dẫn (`§1.1`, `§1.2`, `§2.1`).
+  - Bản đồ các bẫy ngộ nhận (`misconceptions`) kèm gợi ý định hướng.
+  - **Lời giải mẫu chi tiết & Dải dung sai số (`standard_answer` & `standard_keywords`)**.
+- **Human-in-the-Loop:** Người dùng / giáo viên có toàn quyền xem trước và chỉnh sửa trực tiếp Lời giải mẫu và dải đáp số chuẩn trước khi bắt đầu phiên làm bài.
+- **Rào chắn No-spoiler & Mở khóa sau phản tư:** Đáp án chuẩn được khóa kín trong suốt quá trình thử sức và chỉ mở khóa sau khi học viên vượt qua Bước 9 (Phản tư sâu đạt yêu cầu).
+
+### 🌐 Hướng dẫn chạy thử nghiệm
+- **Công nghệ:** React 18 + Vite, Gemini 2.5 Flash, DM Mono & Georgia typographic paper layout.
+- **Truy cập mạng nội bộ LAN:** `http://172.16.28.113:3000`
+- **Truy cập Online Tunnel:** `https://spotty-tires-happen.loca.lt` (IP mật khẩu: `14.238.145.226`)
+- **Khởi động:**
+  ```bash
+  cd codebase
+  npm run dev
+  ```
+
+---
+
 - Thời lượng: **47,5 giờ** từ phát đề đến thuyết trình (ca 3A) — LAB 5 (phát đề + build) · LEC 6 (tiếp tục build theo ca) · LAB 6 (vòng thi)
 - Nhóm: **3-4 người** · thi theo phòng (E403 / E402), chia cụm rồi chung kết phòng — xem *Thể thức thi*
 - **Chia cụm theo bàn**, không cần chung đề tài. Chủ đề tự chọn trong khuôn khổ đề bài
