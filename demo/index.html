@@ -6,156 +6,266 @@
   <title>CP5 Slide Pitch · Track D2: Adaptive AI Tutor (K4-3B-E402)</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Playfair+Display:ital,wght@1,600;1,700&family=DM+Mono:wght@400;500;600&display=swap" rel="stylesheet">
   <style>
     :root {
-      --bg: #090d16;
-      --card-bg: #111827;
-      --card-border: #1f293d;
-      --primary: #6366f1;
-      --primary-gradient: linear-gradient(135deg, #4f46e5 0%, #06b6d4 100%);
-      --accent: #06b6d4;
-      --text: #f3f4f6;
-      --muted: #9ca3af;
-      --success: #10b981;
-      --warning: #f59e0b;
-      --danger: #ef4444;
+      --bg: #fbf9f4;
+      --card-bg: #ffffff;
+      --card-border: #e7e3d8;
+      --text-main: #111827;
+      --text-muted: #6b7280;
+      --accent: #ea580c;
+      --accent-dark: #c2410c;
+      --accent-light: #ffedd5;
+      --green: #15803d;
+      --green-dark: #065f46;
+      --green-light: #dcfce7;
+      --dark-btn: #18181b;
     }
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body {
       font-family: 'Plus Jakarta Sans', -apple-system, sans-serif;
-      background: var(--bg);
-      color: var(--text);
-      overflow-x: hidden;
+      background-color: var(--bg);
+      background-image: 
+        linear-gradient(to right, rgba(0, 0, 0, 0.035) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(0, 0, 0, 0.035) 1px, transparent 1px);
+      background-size: 28px 28px;
+      color: var(--text-main);
       min-height: 100vh;
       display: flex;
       flex-direction: column;
+      overflow-x: hidden;
     }
+
+    /* Top App Navigation Bar (Style như ảnh tham chiếu) */
     header {
-      padding: 16px 32px;
+      padding: 14px 36px;
       display: flex;
       justify-content: space-between;
       align-items: center;
-      border-bottom: 1px solid var(--card-border);
-      background: rgba(17, 24, 39, 0.85);
+      background: rgba(251, 249, 244, 0.92);
       backdrop-filter: blur(10px);
+      border-bottom: 1px solid rgba(0, 0, 0, 0.06);
       position: sticky;
       top: 0;
       z-index: 100;
     }
-    .brand {
+    .brand-group {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-weight: 700;
+      font-size: 15px;
+      color: var(--text-main);
+    }
+    .brand-icon {
+      width: 26px;
+      height: 26px;
+      background: var(--green-dark);
+      color: white;
+      border-radius: 50%;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 13px;
+      font-weight: 800;
+    }
+    .header-actions {
       display: flex;
       align-items: center;
       gap: 12px;
-      font-weight: 800;
-      font-size: 18px;
-      letter-spacing: -0.02em;
     }
-    .badge {
-      background: rgba(99, 102, 241, 0.15);
-      color: #a5b4fc;
-      border: 1px solid rgba(99, 102, 241, 0.3);
-      padding: 4px 10px;
+    .btn-dark-pill {
+      background: var(--dark-btn);
+      color: #fafafa;
+      padding: 6px 14px;
       border-radius: 999px;
       font-size: 12px;
-      font-family: 'JetBrains Mono', monospace;
+      font-weight: 600;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+      transition: all 0.2s;
     }
-    .slide-container {
+    .btn-dark-pill:hover { background: #27272a; color: #fff; }
+    .status-pill {
+      background: var(--green-light);
+      color: #166534;
+      padding: 5px 12px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 600;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      border: 1px solid rgba(22, 101, 52, 0.15);
+    }
+    .status-dot {
+      width: 7px;
+      height: 7px;
+      background: #16a34a;
+      border-radius: 50%;
+      display: inline-block;
+      box-shadow: 0 0 0 2px rgba(22, 163, 74, 0.2);
+    }
+
+    /* Main Slide Presentation Stage */
+    .stage {
       flex: 1;
       display: flex;
       justify-content: center;
       align-items: center;
-      padding: 24px 32px 80px;
-      position: relative;
+      padding: 24px 36px 90px;
     }
     .slide {
       display: none;
       width: 100%;
-      max-width: 1100px;
-      min-height: 600px;
-      background: var(--card-bg);
-      border: 1px solid var(--card-border);
-      border-radius: 20px;
-      padding: 44px 52px;
-      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.6);
-      position: relative;
-      animation: fadeIn 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+      max-width: 1140px;
+      min-height: 620px;
+      background: transparent;
+      animation: slideIn 0.3s cubic-bezier(0.16, 1, 0.3, 1);
     }
     .slide.active { display: flex; flex-direction: column; }
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(12px) scale(0.99); }
+    @keyframes slideIn {
+      from { opacity: 0; transform: translateY(10px) scale(0.995); }
       to { opacity: 1; transform: translateY(0) scale(1); }
     }
-    .slide-tag {
-      font-size: 13px;
+
+    /* Typography & Hierarchy (Đúng như ảnh người dùng gửi) */
+    .overline {
+      font-family: 'DM Mono', monospace;
+      font-size: 11.5px;
       font-weight: 700;
+      letter-spacing: 0.14em;
+      color: var(--green);
       text-transform: uppercase;
-      letter-spacing: 0.08em;
-      color: var(--accent);
-      margin-bottom: 8px;
+      margin-bottom: 6px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
     }
-    .slide-title {
-      font-size: 32px;
+    .main-title {
+      font-size: 44px;
       font-weight: 800;
       letter-spacing: -0.03em;
-      margin-bottom: 24px;
-      background: linear-gradient(135deg, #ffffff 40%, #a5b4fc 100%);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
+      color: var(--text-main);
+      line-height: 1.15;
+      margin-bottom: 8px;
     }
+    .serif-italic {
+      font-family: 'Playfair Display', Georgia, serif;
+      font-style: italic;
+      font-weight: 700;
+      color: var(--accent);
+      margin-left: 2px;
+    }
+    .deck-sub {
+      font-size: 16px;
+      color: var(--text-muted);
+      margin-bottom: 24px;
+      line-height: 1.5;
+    }
+
+    /* Cards & Layouts (Pure White Floating Paper Cards) */
     .grid-2 {
       display: grid;
+      grid-template-columns: 1.15fr 0.85fr;
+      gap: 22px;
+      flex: 1;
+    }
+    .grid-equal {
+      display: grid;
       grid-template-columns: 1fr 1fr;
-      gap: 24px;
+      gap: 22px;
       flex: 1;
     }
     .grid-3 {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
-      gap: 20px;
+      gap: 18px;
       flex: 1;
     }
     .card {
-      background: rgba(255, 255, 255, 0.03);
-      border: 1px solid rgba(255, 255, 255, 0.08);
-      border-radius: 14px;
-      padding: 24px;
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 18px;
+      padding: 26px 28px;
+      box-shadow: 0 10px 25px -4px rgba(0, 0, 0, 0.04), 0 4px 6px -2px rgba(0, 0, 0, 0.02);
       display: flex;
       flex-direction: column;
-      gap: 12px;
+      position: relative;
     }
-    .card.highlight {
-      border-color: rgba(99, 102, 241, 0.4);
-      background: rgba(99, 102, 241, 0.05);
+    .card-top-accent {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 3px;
+      background: linear-gradient(90deg, var(--accent), transparent);
+      border-radius: 18px 18px 0 0;
     }
-    .card h3 {
-      font-size: 18px;
+    .card-tag {
+      font-family: 'DM Mono', monospace;
+      font-size: 11px;
       font-weight: 700;
-      color: #e0e7ff;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 10px;
       display: flex;
       align-items: center;
-      gap: 8px;
+      gap: 6px;
+    }
+    .card h3 {
+      font-size: 20px;
+      font-weight: 700;
+      color: var(--text-main);
+      margin-bottom: 12px;
+      line-height: 1.3;
     }
     .card p, .card li {
-      font-size: 14.5px;
+      font-size: 14px;
       line-height: 1.6;
-      color: var(--muted);
+      color: #4b5563;
     }
-    .card ul { padding-left: 18px; display: flex; flex-direction: column; gap: 8px; }
-    .stat-num {
+    .card ul { padding-left: 20px; display: flex; flex-direction: column; gap: 8px; }
+
+    /* Screenshot Display */
+    .screenshot-box {
+      border-radius: 14px;
+      border: 1px solid var(--card-border);
+      box-shadow: 0 6px 18px rgba(0,0,0,0.06);
+      overflow: hidden;
+      background: white;
+      margin-top: 12px;
+    }
+    .screenshot-box img {
+      width: 100%;
+      height: auto;
+      display: block;
+    }
+
+    /* Metric Counters */
+    .stat-val {
+      font-family: 'DM Mono', monospace;
       font-size: 42px;
       font-weight: 800;
-      font-family: 'JetBrains Mono', monospace;
-      color: var(--accent);
+      color: var(--accent-dark);
       line-height: 1;
+      margin-bottom: 4px;
     }
-    .stat-label {
-      font-size: 13px;
+    .stat-name {
+      font-size: 12px;
       text-transform: uppercase;
-      letter-spacing: 0.05em;
-      color: var(--muted);
+      letter-spacing: 0.08em;
+      color: var(--text-muted);
+      font-weight: 700;
     }
-    .toolbar {
+
+    /* Bottom Control Floating Bar */
+    .bottom-bar {
       position: fixed;
       bottom: 20px;
       left: 50%;
@@ -163,280 +273,355 @@
       display: flex;
       align-items: center;
       gap: 14px;
-      background: rgba(17, 24, 39, 0.9);
+      background: rgba(255, 255, 255, 0.95);
       border: 1px solid var(--card-border);
-      padding: 8px 18px;
+      padding: 8px 20px;
       border-radius: 999px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
       backdrop-filter: blur(12px);
-      box-shadow: 0 10px 25px rgba(0,0,0,0.5);
       z-index: 100;
     }
-    .btn {
-      background: rgba(255, 255, 255, 0.08);
-      border: none;
-      color: var(--text);
-      padding: 8px 16px;
+    .ctrl-btn {
+      background: #f3f0e6;
+      border: 1px solid #dfdacd;
+      color: var(--text-main);
+      padding: 7px 16px;
       border-radius: 999px;
-      font-size: 14px;
+      font-size: 13.5px;
       font-weight: 600;
       cursor: pointer;
-      display: flex;
+      display: inline-flex;
       align-items: center;
       gap: 6px;
       transition: all 0.2s;
     }
-    .btn:hover { background: rgba(255, 255, 255, 0.16); color: #fff; }
-    .btn.primary {
-      background: var(--primary-gradient);
+    .ctrl-btn:hover { background: #e8e3d5; }
+    .ctrl-btn.primary {
+      background: var(--dark-btn);
       color: #fff;
+      border-color: var(--dark-btn);
     }
-    .btn.primary:hover { opacity: 0.9; }
-    .page-indicator {
-      font-family: 'JetBrains Mono', monospace;
+    .ctrl-btn.primary:hover { background: #27272a; }
+    .page-num {
+      font-family: 'DM Mono', monospace;
       font-size: 13px;
-      color: var(--muted);
-      min-width: 60px;
+      font-weight: 600;
+      color: var(--text-muted);
+      min-width: 65px;
       text-align: center;
     }
-    video {
-      width: 100%;
-      border-radius: 12px;
-      border: 1px solid var(--card-border);
-      background: #000;
-    }
+
+    /* Print styles */
     @media print {
-      body { background: #fff; color: #000; }
-      header, .toolbar { display: none !important; }
-      .slide-container { padding: 0; }
+      body { background: #fff !important; }
+      header, .bottom-bar { display: none !important; }
+      .stage { padding: 0 !important; }
       .slide {
         display: flex !important;
         page-break-after: always;
-        border: 1px solid #ddd;
-        background: #fff;
-        color: #111;
-        box-shadow: none;
-        margin-bottom: 20px;
+        min-height: auto;
+        padding: 40px 0;
       }
-      .slide-title { -webkit-text-fill-color: #111; }
-      .card { background: #f9f9f9; border-color: #e5e5e5; }
-      .card h3 { color: #111; }
-      .card p, .card li { color: #444; }
     }
   </style>
 </head>
 <body>
 
+  <!-- Top App Navigation Bar -->
   <header>
-    <div class="brand">
-      <span>🎯 Track D2: Adaptive AI Tutor</span>
-      <span class="badge">Checkpoint 5 · K4-3B-E402</span>
+    <div class="brand-group">
+      <span class="brand-icon">↗</span>
+      <span>Học từ lỗi trước</span>
     </div>
-    <div style="display: flex; gap: 10px;">
-      <a href="demo-video.webm" target="_blank" class="btn" style="text-decoration:none;">🎬 Xem Video Demo</a>
-      <button onclick="window.print()" class="btn">🖨️ Xuất PDF</button>
+    <div class="header-actions">
+      <span class="status-pill"><span class="status-dot"></span> Phiên bảo vệ CP5</span>
+      <a href="demo-video.webm" target="_blank" class="btn-dark-pill">🎬 Video Demo (3.9MB)</a>
+      <button onclick="window.print()" class="ctrl-btn" style="padding: 6px 14px; font-size: 12px;">🖨️ Xuất PDF</button>
     </div>
   </header>
 
-  <div class="slide-container">
+  <!-- Slide Stage -->
+  <main class="stage">
 
-    <!-- SLIDE 1 -->
-    <div class="slide active" id="slide-1">
-      <div class="slide-tag">Slide 1 / 6 · Vấn đề & JTBD</div>
-      <h1 class="slide-title">Nỗi Đau Học Vẹt & Bẫy "Ảo Tưởng Thông Thuộc"</h1>
+    <!-- SLIDE 1: VẤN ĐỀ & JTBD -->
+    <section class="slide active" id="slide-1">
+      <div class="overline">TRACK D2 · HỌC TẬP THÍCH ỨNG (CHÍNH THỨC) · K4-3B-E402</div>
+      <h1 class="main-title">Làm bài trước. <span class="serif-italic">Hiểu lỗi sau.</span></h1>
+      <p class="deck-sub">Một gợi ý đúng lúc giúp bạn tự sửa, thay vì chỉ nhớ vẹt đáp án do AI giải hộ.</p>
+
       <div class="grid-2">
         <div class="card">
-          <h3>🔍 Bối cảnh & Khảo sát 20 Học viên</h3>
-          <p>Khi học các môn kỹ thuật AI (Tokenomics, VRAM, Cache LRU), học viên thường làm theo thói quen:</p>
+          <div class="card-tag">✦ THỰC TRẠNG & KHẢO SÁT 20 HỌC VIÊN</div>
+          <h3>Bẫy "Ảo Tưởng Thông Thuộc" khi dùng ChatGPT</h3>
           <ul>
-            <li><strong>Dùng ChatGPT hỏi ngay cách làm:</strong> AI trả lời trọn vẹn từ A-Z, đưa ra ngay đáp án số ($0.0025, 12GB).</li>
-            <li><strong>Ảo tưởng thông thuộc (Illusion of Competence):</strong> Đọc lời giải thấy rất thuận mắt, tưởng mình đã hiểu sâu sắc.</li>
-            <li><strong>Hậu quả thực tế:</strong> Khi thi hoặc phỏng vấn gặp đề biến tấu, 80% học viên tiếp tục mắc lại các bẫy ngộ nhận kinh điển.</li>
+            <li><strong>65% học viên:</strong> Thói quen tự làm bài tập trước khi mở giáo trình đọc lý thuyết.</li>
+            <li><strong>Khi kẹt bài dùng ChatGPT:</strong> AI giải trọn gói A-Z, đưa luôn đáp số cuối ($0.0025) &rarr; Học viên sinh tâm lý <em>ảo tưởng thông thuộc (Illusion of Competence)</em>, tưởng mình đã hiểu.</li>
+            <li><strong>Hậu quả thực tế:</strong> Gặp bài toán biến tấu, <strong>80% tiếp tục mắc lại</strong> bẫy sai lầm cũ (Token tiếng Việt, đơn giá Input/Output).</li>
           </ul>
+          <div class="screenshot-box" style="margin-top: 16px;">
+            <img src="assets/screen_01_hero.png" alt="Giao diện làm bài thực tế">
+          </div>
         </div>
-        <div class="card highlight">
-          <h3>🎯 JTBD (Job-to-be-Done)</h3>
-          <p><em>"Khi gặp bài tập tính toán phức tạp, tôi cần một Gia sư AI kiên nhẫn phát hiện đúng tầng ngộ nhận, <strong>tuyệt đối không lộ đáp án</strong>, dẫn dắt bằng câu hỏi Socratic để tôi tự tìm ra sai lầm."</em></p>
-          <div style="margin-top: 14px; padding: 12px; background: rgba(0,0,0,0.2); border-radius: 8px;">
-            <div style="font-size: 13px; font-weight: 700; color: #a5b4fc;">TIÊU CHÍ SỐNG CÒN:</div>
-            <p style="font-size: 13.5px; margin-top: 4px;">Học viên phải tự mình sửa sai từ giáo trình chính quy (§1.1-§2.2) và phản tư bản chất trước khi được xem Lời giải mẫu chuẩn.</p>
+
+        <div class="card" style="background: #fffdf9;">
+          <div class="card-top-accent"></div>
+          <div class="card-tag">🎯 JOB-TO-BE-DONE (JTBD)</div>
+          <p style="font-size: 15.5px; font-weight: 500; line-height: 1.6; color: #1f2937; margin: 4px 0 16px;">
+            <em>"Khi gặp bài tập tính toán khó, tôi cần một Gia sư AI kiên nhẫn bắt đúng tầng ngộ nhận, <strong>tuyệt đối không lộ đáp án số</strong>, dẫn dắt bằng câu hỏi Socratic và bắt buộc phản tư bản chất trước khi mở khóa đáp án chuẩn."</em>
+          </p>
+
+          <div style="background: #f7f3ea; border: 1px solid #ede7d8; border-radius: 12px; padding: 16px; margin-top: auto;">
+            <div style="font-size: 12px; font-weight: 700; color: #92400e; text-transform: uppercase; font-family: 'DM Mono', monospace; margin-bottom: 6px;">
+              3 RÀNG BUỘC CỐT LÕI (TRACK D2):
+            </div>
+            <ul style="font-size: 13px; color: #78350f; gap: 6px;">
+              <li><strong>Do-First:</strong> Bắt buộc làm trước khi xem tài liệu.</li>
+              <li><strong>No-spoiler:</strong> Spoiler Rate = 0.0% (Không lộ số cuối).</li>
+              <li><strong>Reflection Bước 9:</strong> Phản tư sâu mới mở khóa Ground Truth.</li>
+            </ul>
           </div>
         </div>
       </div>
-    </div>
+    </section>
 
-    <!-- SLIDE 2 -->
-    <div class="slide" id="slide-2">
-      <div class="slide-tag">Slide 2 / 6 · Giải pháp & Quy trình</div>
-      <h1 class="slide-title">Chu Trình 6 Bước "Học Từ Lỗi Trước" (Do-First)</h1>
-      <div class="grid-3">
-        <div class="card">
-          <h3>1. Tự làm tự do</h3>
-          <p>Học viên nhập suy nghĩ, cách tính và giả định cá nhân vào giao diện. Không dùng trắc nghiệm thụ động A/B/C/D.</p>
-        </div>
-        <div class="card highlight">
-          <h3>2. Chẩn đoán 4 Lớp</h3>
-          <p>AI Engine bắt bẫy ngộ nhận: Token tiếng Việt (Lớp 1), Giá Input/Output (Lớp 2), Triệu tokens (Lớp 3), Mơ hồ (HAX G10).</p>
-        </div>
-        <div class="card">
-          <h3>3. Rào chắn No-spoiler</h3>
-          <p>Tỷ lệ lộ đáp án = 0%. Không bao giờ đưa số cuối cùng hoặc công thức đầy đủ; chỉ đưa 1 câu hỏi khơi gợi tư duy.</p>
-        </div>
-        <div class="card">
-          <h3>4. Đọc Giáo Trình</h3>
-          <p>Cung cấp trích dẫn §1.1-§2.2 và nút <em>"Đọc toàn văn ↗"</em> để học viên đối chiếu lý thuyết cốt lõi.</p>
-        </div>
-        <div class="card highlight">
-          <h3>5. Tự sửa đúng</h3>
-          <p>Học viên đối chiếu, phát hiện điểm sai, tự tính toán lại và nộp bản sửa để hệ thống xác thực.</p>
-        </div>
-        <div class="card">
-          <h3>6. Bước 9 Phản tư</h3>
-          <p>Trả lời: <em>"Vì sao lúc đầu em nhầm?"</em>. Đạt yêu cầu hiểu bản chất mới MỞ KHÓA Lời giải mẫu & Ground Truth.</p>
-        </div>
-      </div>
-    </div>
+    <!-- SLIDE 2: QUY TRÌNH 6 BƯỚC -->
+    <section class="slide" id="slide-2">
+      <div class="overline">KIẾN TRÚC GIẢI PHÁP · CHU TRÌNH SƯ PHẠM SỌC-RÁT</div>
+      <h1 class="main-title">Chu Trình 6 Bước <span class="serif-italic">"Học Từ Lỗi Trước"</span></h1>
+      <p class="deck-sub">Khép kín nhận thức: Làm tự do ➔ Bộc lộ ngộ nhận ➔ Gợi ý Socratic ➔ Tự sửa ➔ Phản tư bản chất.</p>
 
-    <!-- SLIDE 3 -->
-    <div class="slide" id="slide-3">
-      <div class="slide-tag">Slide 3 / 6 · Công nghệ AI & Tính năng mới CP5+</div>
-      <h1 class="slide-title">Bản Đồ Ngộ Nhận & AI Dual Ground Truth</h1>
-      <div class="grid-2">
+      <div class="grid-equal">
         <div class="card">
-          <h3>🌲 Cây 4 Tầng Bẫy Ngộ Nhận</h3>
-          <ul>
-            <li><strong>Lớp 1 (Token tiếng Việt):</strong> Bẫy 1 từ = 1 token (Thực tế BPE UTF-8 = 2.0 - 2.5 tokens/từ).</li>
-            <li><strong>Lớp 2 (Input vs Output):</strong> Nhầm giá input ($0.5/1M) với output ($1.5/1M).</li>
-            <li><strong>Lớp 3 (Đơn vị tính quy đổi):</strong> Chia nhầm 1,000 thay vì 1,000,000 tokens.</li>
-            <li><strong>Lớp 4 (Cảm tính / Thiếu căn cứ):</strong> Quy tắc HAX G10 chặn câu trả lời mơ hồ, bắt buộc nêu số liệu.</li>
-          </ul>
-        </div>
-        <div class="card highlight">
-          <h3>✨ AI Dual Ground Truth (Đề bài & Đáp án chuẩn)</h3>
-          <p>Tính năng đột phá hoàn thiện ở CP5+:</p>
-          <ul>
-            <li><strong>Tải tài liệu tùy ý:</strong> Nhập bài giảng, ghi chú hoặc tài liệu chuyên ngành bất kỳ.</li>
-            <li><strong>Sinh đồng bộ (Dual Generation):</strong> AI đồng thời tạo <em>Đề bài định lượng + Bản đồ ngộ nhận dự kiến + Lời giải mẫu chi tiết + Dải dung sai số</em>.</li>
-            <li><strong>Bảo mật Ground Truth:</strong> Đáp án chuẩn được lưu vào State an toàn, chỉ lộ diện sau khi học viên vượt qua bài phản tư Bước 9.</li>
-          </ul>
-        </div>
-      </div>
-    </div>
-
-    <!-- SLIDE 4 -->
-    <div class="slide" id="slide-4">
-      <div class="slide-tag">Slide 4 / 6 · Kiểm nghiệm Chất lượng (CP4)</div>
-      <h1 class="slide-title">Thước Đo Chất Lượng & Golden Set 22 Cases</h1>
-      <div class="grid-3" style="margin-bottom: 20px;">
-        <div class="card">
-          <div class="stat-num">0.0%</div>
-          <div class="stat-label">Tỷ lệ lộ đáp án (Spoiler Rate)</div>
-          <p style="font-size: 13px;">Cam kết ≤ 5%. Thực tế: 0/22 cases lộ đáp số.</p>
-        </div>
-        <div class="card">
-          <div class="stat-num">100%</div>
-          <div class="stat-label">Độ chính xác chẩn đoán</div>
-          <p style="font-size: 13px;">Cam kết ≥ 75%. Thực tế: 22/22 cases bắt đúng bẫy.</p>
-        </div>
-        <div class="card">
-          <div class="stat-num">350ms</div>
-          <div class="stat-label">Độ trễ phản hồi (P95)</div>
-          <p style="font-size: 13px;">Cam kết ≤ 1500ms. Phản hồi mượt mà, tức thì.</p>
-        </div>
-      </div>
-      <div class="card">
-        <h3>📊 Phân bổ 22 Test Cases Kiểm Thử Tự Động:</h3>
-        <p>10 bẫy Token tiếng Việt (Lớp 1) · 4 bẫy Đơn giá Input/Output (Lớp 2) · 4 bẫy Quy đổi Triệu (Lớp 3) · 2 ca Tự sửa đúng · 2 ca Thiếu căn cứ HAX G10. Tất cả được tích hợp trực tiếp thành Modal chạy kiểm nghiệm realtime trên UI ứng dụng.</p>
-      </div>
-    </div>
-
-    <!-- SLIDE 5 -->
-    <div class="slide" id="slide-5">
-      <div class="slide-tag">Slide 5 / 6 · Thử nghiệm Người dùng (Rubric R6)</div>
-      <h1 class="slide-title">Thực Nghiệm 5 Người Dùng Độc Lập Ngoài Nhóm</h1>
-      <div class="grid-2">
-        <div class="card">
-          <h3>📈 Kết Quả Định Lượng</h3>
-          <ul>
-            <li><strong>Tỷ lệ tự sửa đúng:</strong> Tăng vọt từ <strong>20%</strong> (lần đầu) lên <strong>85%</strong> sau gợi ý Socratic.</li>
-            <li><strong>Thời gian giải quyết:</strong> Trung bình 4.2 phút / bài tập.</li>
-            <li><strong>Chỉ số hài lòng (CSAT):</strong> <strong>4.8 / 5.0</strong> sao.</li>
-            <li><strong>Người dùng đánh giá:</strong> Cảm giác vỡ òa khi tự mình tính ra kết quả thay vì bị ép học thuộc vẹt.</li>
-          </ul>
-        </div>
-        <div class="card highlight">
-          <h3>🔄 Cải Tiến Theo Góp Ý (Rubric R6)</h3>
-          <ul>
-            <li><strong>Trần Minh Đức (Kẹt nút nộp):</strong> Đã làm nổi bật nút <em>"Nộp bài sửa"</em> với hiệu ứng màu sắc trực quan.</li>
-            <li><strong>Phạm Thu Hà (Muốn đọc tài liệu):</strong> Đã bổ sung nút tra cứu trọn vẹn toàn văn giáo trình ngay trong modal.</li>
-            <li><strong>Vũ Hoàng Linh (Khó phản tư):</strong> Đã bổ sung chip mẫu ví dụ <em>"Hiểu sâu"</em> và <em>"Chép vẹt"</em> để định hướng tư duy.</li>
-          </ul>
-        </div>
-      </div>
-    </div>
-
-    <!-- SLIDE 6 -->
-    <div class="slide" id="slide-6">
-      <div class="slide-tag">Slide 6 / 6 · Demo Video & Đội ngũ Thực hiện</div>
-      <h1 class="slide-title">Sẵn Sàng Triển Khai Thực Tế (CP5 Complete)</h1>
-      <div class="grid-2">
-        <div class="card">
-          <h3>👥 Đội Ngũ K4-3B-E402</h3>
-          <ul style="font-size: 13.5px;">
-            <li><strong>Ngô Tuấn Tùng (Lead):</strong> Kiến trúc hệ thống, Spec, Prompt Engineering, Slide pitch CP5.</li>
-            <li><strong>Nguyễn Thị Huyền:</strong> Thiết kế UX/UI, kiểm thử chất lượng, Golden Set 22 test cases.</li>
-            <li><strong>Đào Mạnh Cương:</strong> Xây dựng logic chẩn đoán ngộ nhận, Socratic hints, Dual Ground Truth.</li>
-            <li><strong>Trần Văn Khánh:</strong> Dữ liệu người dùng thực tế (validation/), tài liệu hóa và quay video demo.</li>
-          </ul>
-          <div style="margin-top: 10px; font-size: 13px; color: var(--accent); font-family: 'JetBrains Mono', monospace;">
-            🔗 Repo: github.com/tuantung26/K4-3B-E402-Vinhackathon
+          <div class="card-tag">✦ QUY TRÌNH 6 BƯỚC KHÉP KÍN</div>
+          <div style="display: flex; flex-direction: column; gap: 10px; margin-top: 4px;">
+            <div style="padding: 10px 14px; background: #fbf9f4; border: 1px solid var(--card-border); border-radius: 10px;">
+              <strong style="color: var(--accent);">1. Tự làm tự do:</strong> Học viên nhập giả định & cách tính (không trắc nghiệm thụ động).
+            </div>
+            <div style="padding: 10px 14px; background: #fbf9f4; border: 1px solid var(--card-border); border-radius: 10px;">
+              <strong style="color: var(--accent);">2. Chẩn đoán 4 lớp:</strong> AI đối chiếu lời giải với cây bẫy ngộ nhận kinh điển.
+            </div>
+            <div style="padding: 10px 14px; background: #fff7ed; border: 1px solid #fed7aa; border-radius: 10px;">
+              <strong style="color: var(--accent-dark);">3. Gợi ý Socratic:</strong> Tuyệt đối không lộ đáp án! Chỉ hỏi 1 câu gợi mở góc nhìn.
+            </div>
+            <div style="padding: 10px 14px; background: #fbf9f4; border: 1px solid var(--card-border); border-radius: 10px;">
+              <strong style="color: var(--green);">4. Đối chiếu Giáo trình:</strong> Dẫn số hiệu trích đoạn §1.1 – §1.2 để tự kiểm chứng.
+            </div>
+            <div style="padding: 10px 14px; background: #fbf9f4; border: 1px solid var(--card-border); border-radius: 10px;">
+              <strong style="color: var(--green);">5. Tự sửa đúng:</strong> Học viên tự tính lại và nộp bài sửa lần 2.
+            </div>
+            <div style="padding: 10px 14px; background: #ecfdf5; border: 1px solid #a7f3d0; border-radius: 10px;">
+              <strong style="color: #065f46;">6. Bước 9 Phản tư & Ground Truth:</strong> Giải thích lý do nhầm ➔ Mở khóa Lời giải mẫu.
+            </div>
           </div>
         </div>
-        <div class="card highlight">
-          <h3>🎬 Video Demo Thao Tác Trực Tiếp</h3>
-          <video controls poster="" style="max-height: 220px;">
+
+        <div class="card" style="background: #fffdf9;">
+          <div class="card-top-accent"></div>
+          <div class="card-tag">✦ MINH HỌA THỰC TẾ TRÊN ỨNG DỤNG</div>
+          <div class="screenshot-box">
+            <img src="assets/screen_02_socratic_hint.png" alt="Phản hồi gợi ý Socratic và trích dẫn giáo trình">
+          </div>
+          <p style="font-size: 13px; color: var(--text-muted); margin-top: 10px;">
+            ▲ <em>Giao diện thực tế: Khi học viên tính sai (1 từ = 1 token), AI chẩn đoán Lớp 1, đưa ra gợi ý dẫn đường và trích dẫn §1.2 nhưng không bao giờ đưa ra số $0.0025.</em>
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- SLIDE 3: BẢN ĐỒ NGỘ NHẬN & DUAL GROUND TRUTH -->
+    <section class="slide" id="slide-3">
+      <div class="overline">CÔNG NGHỆ CỐT LÕI · MISCONCEPTION ENGINE & CP5+ DUAL GENERATION</div>
+      <h1 class="main-title">Bản Đồ Ngộ Nhận & <span class="serif-italic">AI Dual Ground Truth</span></h1>
+      <p class="deck-sub">Cây 4 tầng sai lầm kinh điển và tính năng tự động sinh Đề bài kèm Cặp Đáp án chuẩn.</p>
+
+      <div class="grid-2">
+        <div class="card">
+          <div class="card-tag">✦ CÂY 4 TẦNG BẪY NGỘ NHẬN (MISCONCEPTION TREE)</div>
+          <ul style="gap: 12px; margin-top: 4px;">
+            <li>
+              <strong>Lớp 1 (Token tiếng Việt):</strong> Bẫy 1 từ = 1 token.<br>
+              <span style="font-size: 13px; color: #6b7280;">&rarr; Thực tế BPE UTF-8 tách tiếng Việt thành 2.0 – 2.5 tokens/từ.</span>
+            </li>
+            <li>
+              <strong>Lớp 2 (Input vs Output price):</strong> Nhầm lẫn đơn giá.<br>
+              <span style="font-size: 13px; color: #6b7280;">&rarr; Input $0.50/1M token vs Output sinh ra $1.50/1M token.</span>
+            </li>
+            <li>
+              <strong>Lớp 3 (Đơn vị tính triệu token):</strong> Lỗi toán học quy đổi.<br>
+              <span style="font-size: 13px; color: #6b7280;">&rarr; Chia nhầm cho 1,000 thay vì 1,000,000 tokens.</span>
+            </li>
+            <li>
+              <strong>Lớp 4 (Cảm tính / Thiếu căn cứ - HAX G10):</strong> Chặn đoán mò.<br>
+              <span style="font-size: 13px; color: #6b7280;">&rarr; Từ chối câu trả lời cụt ngủn ("chắc rẻ lắm"), bắt buộc nhập các bước tính.</span>
+            </li>
+          </ul>
+        </div>
+
+        <div class="card" style="background: #fffcf8;">
+          <div class="card-top-accent"></div>
+          <div class="card-tag">✨ TÍNH NĂNG MỚI CP5+: DUAL GENERATION</div>
+          <h3>AI Sinh đề bài & Đáp án chuẩn</h3>
+          <p style="font-size: 13.5px; color: #4b5563;">
+            Tải tài liệu tùy ý (PDF / Text / Notes), AI đồng bộ trích xuất: Đề bài thực hành, bẫy ngộ nhận, lời giải mẫu và dải dung sai số.
+          </p>
+          <div class="screenshot-box" style="margin-top: 10px;">
+            <img src="assets/screen_05_generator.png" alt="Modal sinh đề và đáp án chuẩn">
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SLIDE 4: THƯỚC ĐO CHẤT LƯỢNG & GOLDEN SET -->
+    <section class="slide" id="slide-4">
+      <div class="overline">KIỂM ĐỊNH CHẤT LƯỢNG · KHÓA CHUẨN "ĐẠT" CP4</div>
+      <h1 class="main-title">Thước Đo Chất Lượng & <span class="serif-italic">Bộ Đo Golden Set</span></h1>
+      <p class="deck-sub">Kiểm thử tự động trên 22 cases thực tế, khóa cứng chuẩn chất lượng sư phạm.</p>
+
+      <div class="grid-3" style="margin-bottom: 20px; flex: none;">
+        <div class="card" style="text-align: center; padding: 20px;">
+          <div class="stat-val" style="color: var(--green);">0.0%</div>
+          <div class="stat-name">Tỷ lệ lộ đáp án (Spoiler)</div>
+          <p style="font-size: 12.5px; margin-top: 4px; color: var(--green); font-weight: 600;">Cam kết &le;5% · Vượt chuẩn</p>
+        </div>
+        <div class="card" style="text-align: center; padding: 20px;">
+          <div class="stat-val" style="color: var(--green);">100%</div>
+          <div class="stat-name">Độ chính xác chẩn đoán</div>
+          <p style="font-size: 12.5px; margin-top: 4px; color: var(--green); font-weight: 600;">22 / 22 ca bẫy bắt đúng</p>
+        </div>
+        <div class="card" style="text-align: center; padding: 20px;">
+          <div class="stat-val" style="color: #2563eb;">350ms</div>
+          <div class="stat-name">Độ trễ phản hồi (P95)</div>
+          <p style="font-size: 12.5px; margin-top: 4px; color: #2563eb; font-weight: 600;">Yêu cầu &le;1500ms · Rất mượt</p>
+        </div>
+      </div>
+
+      <div class="grid-equal">
+        <div class="card">
+          <div class="card-tag">✦ PHÂN BỔ 22 TEST CASES KIỂM ĐỊNH TỰ ĐỘNG</div>
+          <ul style="gap: 6px; font-size: 13.5px; margin-top: 4px;">
+            <li><strong>10 ca bẫy Token tiếng Việt (Lớp 1):</strong> Bắt đúng 10/10 (100%).</li>
+            <li><strong>4 ca bẫy Đơn giá Input/Output (Lớp 2):</strong> Bắt đúng 4/4 (100%).</li>
+            <li><strong>4 ca bẫy Đơn vị tính quy đổi (Lớp 3):</strong> Bắt đúng 4/4 (100%).</li>
+            <li><strong>2 ca Tự sửa đúng:</strong> Công nhận chính xác 2/2 (100%).</li>
+            <li><strong>2 ca Mơ hồ/cảm tính (HAX G10):</strong> Chặn đúng 2/2 (100%).</li>
+          </ul>
+        </div>
+        <div class="card" style="padding: 16px;">
+          <div class="screenshot-box" style="margin-top: 0;">
+            <img src="assets/screen_04_golden_set.png" alt="Modal kiểm định tự động 22 test cases">
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SLIDE 5: THỬ NGHIỆM NGƯỜI DÙNG THỰC TẾ -->
+    <section class="slide" id="slide-5">
+      <div class="overline">THỰC NGHIỆM THỰC TẾ · RUBRIC R6 BONUS (8 ĐIỂM)</div>
+      <h1 class="main-title">Bằng Chứng Thực Nghiệm & <span class="serif-italic">Nhật Ký Người Dùng</span></h1>
+      <p class="deck-sub">Kiểm chứng trực tiếp với 5 người dùng ngoài nhóm, ghi nhận quote nguyên văn và cải tiến UI.</p>
+
+      <div class="grid-2">
+        <div class="card">
+          <div class="card-tag">✦ QUOTE NGUYÊN VĂN CỦA NGƯỜI DÙNG NGOÀI (CP1 TESTERS)</div>
+          <div style="display: flex; flex-direction: column; gap: 14px; margin-top: 6px;">
+            <div style="padding: 12px 14px; background: #fbf9f4; border-left: 3px solid var(--accent); border-radius: 0 8px 8px 0;">
+              <strong>Trần Minh Đức (Kẹt nút nộp bài):</strong>
+              <p style="font-style: italic; color: #b45309; margin: 4px 0;">"Ủa nộp bài sửa xong bấm chỗ nào để AI kiểm tra lại lần hai vậy, nhìn hai nút hơi giống nhau."</p>
+              <span style="font-size: 12px; color: var(--green); font-weight: 600;">➔ Đã sửa ngay: Đổi CTA thành "Nộp bài sửa" nổi bật màu xanh đậm (HAX G9).</span>
+            </div>
+            <div style="padding: 12px 14px; background: #fbf9f4; border-left: 3px solid var(--green); border-radius: 0 8px 8px 0;">
+              <strong>Lê Hoàng Nam (Thử thách rào chắn HAX G10):</strong>
+              <p style="font-style: italic; color: #b45309; margin: 4px 0;">"Nó bắt nhập cách tính chứ không chịu đoán hộ à, tưởng nói rẻ là nó tính ra tiền luôn chứ."</p>
+              <span style="font-size: 12px; color: #065f46; font-weight: 600;">➔ Quyết định giữ nguyên: Bảo toàn tính nghiêm cẩn sư phạm, chống đoán mò.</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="card" style="background: #fffdf9;">
+          <div class="card-top-accent"></div>
+          <div class="card-tag">📈 HIỆU QUẢ ĐỊNH LƯỢNG</div>
+          <div style="display: flex; gap: 24px; margin: 8px 0 16px;">
+            <div>
+              <div class="stat-val" style="font-size: 34px;">20% ➔ 85%</div>
+              <div class="stat-name">Tỷ lệ tự sửa đúng</div>
+            </div>
+            <div>
+              <div class="stat-val" style="font-size: 34px; color: var(--green);">4.8 / 5.0</div>
+              <div class="stat-name">Độ hài lòng (CSAT)</div>
+            </div>
+          </div>
+          <div style="background: #f7f3ea; border-radius: 10px; padding: 12px; font-size: 13px; color: #4b5563;">
+            <strong>4 dòng tổng kết cốt lõi:</strong><br>
+            • <em>Lặp nhiều nhất:</em> Lúng túng tìm nút nộp lần 2.<br>
+            • <em>Sửa trước demo:</em> CTA rõ ràng, thêm tra cứu toàn văn giáo trình.<br>
+            • <em>Giữ nguyên:</em> No-spoiler và HAX G10 vì là linh hồn sản phẩm.<br>
+            • <em>Để dành sau:</em> Visualizer phân tách token màu sắc realtime.
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SLIDE 6: TỔNG KẾT & DEMO -->
+    <section class="slide" id="slide-6">
+      <div class="overline">TỔNG KẾT DELIVERABLES CP5 · SẴN SÀNG THUYẾT TRÌNH CP6</div>
+      <h1 class="main-title">Sẵn Sàng Triển Khai & <span class="serif-italic">Đội Ngũ K4-3B-E402</span></h1>
+      <p class="deck-sub">Hoàn thiện 100% deliverables: Web App trực tuyến, Video demo thao tác thực tế, Slide chuẩn rubric.</p>
+
+      <div class="grid-2">
+        <div class="card">
+          <div class="card-tag">👥 ĐỘI NGŨ THỰC HIỆN DỰ ÁN</div>
+          <ul style="gap: 8px; margin-top: 4px;">
+            <li><strong>Ngô Tuấn Tùng (Lead):</strong> Kiến trúc hệ thống, Spec, Canvas, Slide pitch CP5.</li>
+            <li><strong>Đào Thị Huyền:</strong> Thiết kế System Prompt, Guardrails chống lộ đáp án, tích hợp AI.</li>
+            <li><strong>Nguyễn Huy Cương:</strong> Khảo sát JTBD, thiết kế đề bài & trích dẫn giáo trình (§1.1, §1.2).</li>
+            <li><strong>Trần Văn Khánh:</strong> Chuẩn hóa Golden Set 22 cases, kiểm thử thực tế & Video demo.</li>
+          </ul>
+
+          <div style="margin-top: 14px; padding: 12px 16px; background: #fbf9f4; border: 1px solid var(--card-border); border-radius: 10px; font-size: 13px;">
+            🔗 <strong>GitHub Repository:</strong> <a href="https://github.com/tuantung26/K4-3B-E402-Vinhackathon" target="_blank" style="color: #2563eb; font-family: 'DM Mono', monospace; text-decoration: none; font-weight: 600;">tuantung26/K4-3B-E402-Vinhackathon</a>
+          </div>
+        </div>
+
+        <div class="card" style="background: #fffcf8;">
+          <div class="card-top-accent"></div>
+          <div class="card-tag">🎬 VIDEO DEMO THAO TÁC (CP5 DELIVERABLE)</div>
+          <video controls style="width: 100%; border-radius: 10px; border: 1px solid var(--card-border); max-height: 220px; background: #000;">
             <source src="demo-video.webm" type="video/webm">
-            Trình duyệt của bạn không hỗ trợ video thẻ tag.
           </video>
-          <p style="font-size: 12.5px; margin-top: 6px; color: var(--muted);">
+          <p style="font-size: 12px; color: var(--text-muted); margin-top: 8px;">
             Ghi lại trọn vẹn: Lỗi Lớp 1 ➔ Mơ hồ HAX G10 ➔ Tự sửa đúng ➔ Bước 9 Phản tư mở khóa Ground Truth ➔ Golden Set 22 cases ➔ Tải tài liệu sinh đề mới.
           </p>
         </div>
       </div>
-    </div>
+    </section>
 
-  </div>
+  </main>
 
-  <!-- TOOLBAR -->
-  <div class="toolbar">
-    <button class="btn" onclick="prevSlide()">◀ Trang trước</button>
-    <div class="page-indicator"><span id="current-num">1</span> / 6</div>
-    <button class="btn primary" onclick="nextSlide()">Trang sau ▶</button>
-  </div>
+  <!-- Bottom Navigation Control -->
+  <nav class="bottom-bar">
+    <button class="ctrl-btn" onclick="prevSlide()">◀ Trước</button>
+    <div class="page-num"><span id="page-cur">1</span> / 6</div>
+    <button class="ctrl-btn primary" onclick="nextSlide()">Sau ▶</button>
+  </nav>
 
   <script>
-    let currentSlide = 1;
-    const totalSlides = 6;
+    let current = 1;
+    const total = 6;
 
-    function updateSlide() {
-      for (let i = 1; i <= totalSlides; i++) {
-        const el = document.getElementById('slide-' + i);
-        if (el) el.classList.toggle('active', i === currentSlide);
+    function render() {
+      for (let i = 1; i <= total; i++) {
+        const s = document.getElementById('slide-' + i);
+        if (s) s.classList.toggle('active', i === current);
       }
-      document.getElementById('current-num').textContent = currentSlide;
+      document.getElementById('page-cur').textContent = current;
     }
 
     function nextSlide() {
-      if (currentSlide < totalSlides) {
-        currentSlide++;
-        updateSlide();
-      }
+      if (current < total) { current++; render(); }
     }
 
     function prevSlide() {
-      if (currentSlide > 1) {
-        currentSlide--;
-        updateSlide();
-      }
+      if (current > 1) { current--; render(); }
     }
 
     document.addEventListener('keydown', (e) => {
