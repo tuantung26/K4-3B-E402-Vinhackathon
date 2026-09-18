@@ -1,24 +1,15 @@
 <!doctype html>
 <html lang="vi">
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Học từ lỗi trước</title>
-  <link rel="stylesheet" href="styles.css">
-  <link rel="stylesheet" href="styles-extra.css">
-</head>
-<body>
-  <header class="topbar"><div class="brand"><span class="brand-mark">↗</span><span>Học từ lỗi trước</span></div><span class="status"><i></i> Phiên luyện tập</span></header>
-  <main class="shell">
-    <section class="intro"><p class="eyebrow">TRACK D2 · CP3 PROTOTYPE</p><h1>Làm bài trước.<br><em>Hiểu lỗi sau.</em></h1><p class="lede">Một gợi ý đúng lúc giúp bạn tự sửa, thay vì chỉ nhớ đáp án.</p><div class="progress"><span class="progress-label">Bài 01 / 01</span><span class="progress-track"><b></b></span><span class="progress-label">Chưa hoàn thành</span></div></section>
-    <section class="workspace">
-      <article class="exercise-panel"><div class="panel-kicker">BÀI TẬP · BƯỚC 1</div><h2 id="exercise-title">Đang tải bài tập...</h2><p id="exercise-prompt"></p><div class="how-to"><strong>Cách làm</strong><ol><li>Viết phép tính hoặc các bước bạn đã làm.</li><li>Nêu rõ giả định nếu bạn đang ước lượng.</li><li>Bấm <b>Nộp bài</b>. Sai cũng được, vì AI sẽ chỉ gợi ý để bạn tự sửa.</li></ol></div><label for="answer">Bài làm của bạn</label><textarea id="answer" maxlength="2000" placeholder="Ví dụ: Tôi chuyển ... rồi ... nên x = ..." aria-describedby="answer-help"></textarea><div class="input-meta"><span id="answer-help">Nên viết ít nhất một bước tính.</span><span id="answer-count">0 / 2000</span></div><div class="actions"><button class="primary" id="submit">Nộp bài <span>↗</span></button><button class="ghost" id="reset">Làm lại</button></div><p class="privacy">Phiên này chỉ lưu trạng thái ẩn danh để đo lường.</p></article>
-      <aside class="feedback-panel" id="feedback" aria-live="polite"><div class="empty-state"><span class="empty-icon">✦</span><h3>Phản hồi sẽ xuất hiện ở đây</h3><p>Hãy làm bài theo cách bạn nghĩ trước. AI sẽ chỉ ra điểm cần xem lại và dẫn bạn tới đúng đoạn tài liệu.</p></div></aside>
-    </section>
-    <section class="metrics"><div><span>PHIÊN CP3</span><strong id="attempt-count">0</strong><small>lượt thử</small></div><div><span>KẾT QUẢ</span><strong id="accuracy">—</strong><small>lượt đúng</small></div><div><span>AI ENGINE</span><strong id="engine">Fixture</strong><small>có thể thay bằng AI thật</small></div></section>
-    <section class="eval-strip"><div><span class="panel-kicker">BỘ ĐO CP3</span><h2><span id="eval-total-label">Golden set</span> đã chuẩn bị</h2><p>Chạy toàn bộ golden set để kiểm tra agent trước khi quay video.</p></div><button class="ghost" id="run-eval">Chạy bộ ca đo ↗</button><strong id="eval-result"></strong></section>
-  </main>
-  <footer>Học từ lỗi trước <span>·</span> Một bài tập, một vòng lặp hiểu sâu</footer>
-  <script src="app.js"></script>
-</body>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Học từ lỗi trước — Track D2 Adaptive AI Tutor</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Mono:ital,wght@0,400;0,500;1,400&family=Manrope:wght@400;500;600;700;800&family=Newsreader:ital,opsz,wght@1,6..72,400;1,6..72,500;1,6..72,600&display=swap" rel="stylesheet">
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.jsx"></script>
+  </body>
 </html>
