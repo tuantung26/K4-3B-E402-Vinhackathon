@@ -8,10 +8,10 @@
 
 | Họ và Tên | Mã Học Viên | Vai trò chính | Phần việc đảm nhiệm trong dự án |
 |---|---|---|---|
-| Ngô Tuấn Tùng | 2A202602826 |  |  |
-| Đào Thị Huyền | 2A202602670 |  |  |
-| Nguyễn Huy Cương | 2A202602842 |  |  |
-| Trần Văn Khánh | 2A202602413 |  |  |
+| Ngô Tuấn Tùng | 2A202602826 | Trưởng nhóm / Product Lead | Chủ trì viết & chốt AI Spec, Canvas, điều phối tiến độ, thiết kế Slide pitch CP5/CP6 |
+| Đào Thị Huyền | 2A202602670 | AI Engineer & Prompting | Thiết kế System Prompt, xây dựng Guardrails chống lộ đáp án (No-spoiler), tích hợp Gemini API |
+| Nguyễn Huy Cương | 2A202602842 | Domain & Evidence Lead | Khảo sát nhu cầu người dùng (JTBD), phân tích dữ liệu 20 học viên, thiết kế đề bài & trích dẫn (§1.1, §1.2, §2.1) |
+| Trần Văn Khánh | 2A202602413 | QA & Evaluation Engineer | Chuẩn hóa bộ Golden Set 22 cases (`eval/`), viết script test runner (`run_eval.py`), đo lường metrics & phân tích lỗi |
 
 > Nhóm copy nguyên file README này về repo của mình, rồi điền bảng trên. Cột **Phần việc đảm nhiệm** ghi càng cụ thể càng tốt.
 
