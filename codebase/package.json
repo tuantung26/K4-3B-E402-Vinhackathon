@@ -1,0 +1,9 @@
+{
+  "name": "hoc-tu-loi-truoc",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Prototype CP3 - Hoc tu loi truoc",
+  "scripts": {
+    "start": "node server.js"
+  }
+}
